@@ -2,9 +2,10 @@
 
 ## 环境配置
 - python: 3.7.0
-- django: 2.2.7
+- django: 3.0
 - djangorestframework: 3.10.3
 - pypinyin: 0.36.0
+- mysqlclient: 1.4.6
 格式化工具为autopep8 1.4.4
 
 ## 功能划分
