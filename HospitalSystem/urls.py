@@ -8,4 +8,5 @@ urlpatterns = [
     re_path(r'^', include('Finance.urls')),
     re_path(r'^', include('Medicine.urls')),
     re_path(r'^', include('Outpatient.urls')),
+    re_path(r'^', include('Laboratory.urls')),
 ]

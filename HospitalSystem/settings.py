@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'Finance.apps.FinanceConfig',
     'Medicine.apps.MedicineConfig',
     'Outpatient.apps.OutpatientConfig',
-    'User.apps.UserConfig'
+    'User.apps.UserConfig',
+    'Laboratory.apps.LaboratoryConfig',
 ]
 
 MIDDLEWARE = [
