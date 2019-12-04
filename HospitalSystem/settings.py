@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'Outpatient.apps.OutpatientConfig',
     'User.apps.UserConfig',
     'Laboratory.apps.LaboratoryConfig',
+    'Reservation.apps.ReservationConfig',
 ]
 
 MIDDLEWARE = [

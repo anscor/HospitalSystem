@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 
+IS_NOT = (
+    (0, '否'),
+    (1, '是')
+)
+
 
 class Occupation(models.Model):
     '''
@@ -96,3 +101,23 @@ class UserLogRecord(models.Model):
         verbose_name = '用户登录相关日志记录'
         verbose_name_plural = '用户登录相关日志记录'
         db_table = 'user_log_record'
+
+
+class BlackList(models.Model):
+    patient = models.OneToOneField(
+        User, on_delete=models.DO_NOTHING, related_name='is_black', verbose_name='病人id')
+
+    join_time = models.DateTimeField(auto_now_add=True, verbose_name='加入时间')
+    is_delete = models.BooleanField(
+        choices=IS_NOT, verbose_name='是否从黑名单移除', default=0)
+    reason = models.CharField(max_length=64, null=True,
+                              blank=True, verbose_name='加入黑名单原因')
+
+    # 一般为系统默认添加，但有时候可能会由工作人员人为设置
+    creator = models.ForeignKey(User, on_delete=models.DO_NOTHING,
+                                related_name='created_black_lists', verbose_name='创建者id')
+
+    class Meta:
+        verbose_name = '黑名单'
+        verbose_name_plural = '黑名单'
+        db_table = 'black_list'
