@@ -15,49 +15,124 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Medicine',
+            name="Medicine",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, verbose_name='药物名')),
-                ('in_price', models.FloatField(verbose_name='进货价')),
-                ('price', models.FloatField(verbose_name='单价')),
-                ('count', models.IntegerField(verbose_name='库存数量')),
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('modify_time', models.DateTimeField(auto_now_add=True, null=True, verbose_name='修改时间')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=256, verbose_name="药物名")),
+                ("in_price", models.FloatField(verbose_name="进货价")),
+                ("price", models.FloatField(verbose_name="单价")),
+                ("count", models.IntegerField(verbose_name="库存数量")),
+                (
+                    "create_time",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="创建时间"
+                    ),
+                ),
+                (
+                    "modify_time",
+                    models.DateTimeField(
+                        auto_now_add=True, null=True, verbose_name="修改时间"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '药物',
-                'verbose_name_plural': '药物',
-                'db_table': 'medicine',
+                "verbose_name": "药物",
+                "verbose_name_plural": "药物",
+                "db_table": "medicine",
             },
         ),
         migrations.CreateModel(
-            name='MedicineType',
+            name="MedicineType",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, verbose_name='类型名')),
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('modify_time', models.DateTimeField(auto_now_add=True, null=True, verbose_name='修改时间')),
-                ('creator', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='created_medicine_types', to=settings.AUTH_USER_MODEL, verbose_name='创建者id')),
-                ('modifier', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='modified_medicine_types', to=settings.AUTH_USER_MODEL, verbose_name='修改者id')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=256, verbose_name="类型名")),
+                (
+                    "create_time",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="创建时间"
+                    ),
+                ),
+                (
+                    "modify_time",
+                    models.DateTimeField(
+                        auto_now_add=True, null=True, verbose_name="修改时间"
+                    ),
+                ),
+                (
+                    "creator",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="created_medicine_types",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="创建者id",
+                    ),
+                ),
+                (
+                    "modifier",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="modified_medicine_types",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="修改者id",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '药物类型',
-                'verbose_name_plural': '药物类型',
-                'db_table': 'medicine_type',
+                "verbose_name": "药物类型",
+                "verbose_name_plural": "药物类型",
+                "db_table": "medicine_type",
             },
         ),
         migrations.CreateModel(
-            name='MedicineHandoutRecord',
+            name="MedicineHandoutRecord",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('creator', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='created_medicine_handout_records', to=settings.AUTH_USER_MODEL, verbose_name='创建者id')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "create_time",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="创建时间"
+                    ),
+                ),
+                (
+                    "creator",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="created_medicine_handout_records",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="创建者id",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '药物发放记录',
-                'verbose_name_plural': '药物发放记录',
-                'db_table': 'medicine_handout_record',
+                "verbose_name": "药物发放记录",
+                "verbose_name_plural": "药物发放记录",
+                "db_table": "medicine_handout_record",
             },
         ),
     ]

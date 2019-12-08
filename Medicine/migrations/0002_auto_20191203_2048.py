@@ -10,30 +10,52 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('Outpatient', '0001_initial'),
+        ("Outpatient", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Medicine', '0001_initial'),
+        ("Medicine", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='medicinehandoutrecord',
-            name='prescription',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='medicine_handout_records', to='Outpatient.Prescription', verbose_name='处方id'),
+            model_name="medicinehandoutrecord",
+            name="prescription",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="medicine_handout_records",
+                to="Outpatient.Prescription",
+                verbose_name="处方id",
+            ),
         ),
         migrations.AddField(
-            model_name='medicine',
-            name='creator',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='created_medicine', to=settings.AUTH_USER_MODEL, verbose_name='创建者id'),
+            model_name="medicine",
+            name="creator",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="created_medicine",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="创建者id",
+            ),
         ),
         migrations.AddField(
-            model_name='medicine',
-            name='medicine_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='medicine', to='Medicine.MedicineType', verbose_name='药物类型id'),
+            model_name="medicine",
+            name="medicine_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="medicine",
+                to="Medicine.MedicineType",
+                verbose_name="药物类型id",
+            ),
         ),
         migrations.AddField(
-            model_name='medicine',
-            name='modifier',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='modified_medicine', to=settings.AUTH_USER_MODEL, verbose_name='修改者id'),
+            model_name="medicine",
+            name="modifier",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="modified_medicine",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="修改者id",
+            ),
         ),
     ]

@@ -15,107 +15,317 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='PayItem',
+            name="PayItem",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('count', models.IntegerField(verbose_name='数量')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("count", models.IntegerField(verbose_name="数量")),
             ],
             options={
-                'verbose_name': '缴费项目',
-                'verbose_name_plural': '缴费项目',
-                'db_table': 'pay_item',
+                "verbose_name": "缴费项目",
+                "verbose_name_plural": "缴费项目",
+                "db_table": "pay_item",
             },
         ),
         migrations.CreateModel(
-            name='RefundRecord',
+            name="RefundRecord",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('method', models.IntegerField(choices=[(0, '现金'), (1, '银联'), (2, '支付宝'), (3, '微信')], default=0, verbose_name='退款方式')),
-                ('refund', models.FloatField(verbose_name='退款金额')),
-                ('reason', models.CharField(blank=True, max_length=256, null=True, verbose_name='退款原因')),
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('creator', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='created_refund_records', to=settings.AUTH_USER_MODEL, verbose_name='创建者id')),
-                ('item', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='refunds', to='Finance.PayItem', verbose_name='项目id')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "method",
+                    models.IntegerField(
+                        choices=[(0, "现金"), (1, "银联"), (2, "支付宝"), (3, "微信")],
+                        default=0,
+                        verbose_name="退款方式",
+                    ),
+                ),
+                ("refund", models.FloatField(verbose_name="退款金额")),
+                (
+                    "reason",
+                    models.CharField(
+                        blank=True,
+                        max_length=256,
+                        null=True,
+                        verbose_name="退款原因",
+                    ),
+                ),
+                (
+                    "create_time",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="创建时间"
+                    ),
+                ),
+                (
+                    "creator",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="created_refund_records",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="创建者id",
+                    ),
+                ),
+                (
+                    "item",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="refunds",
+                        to="Finance.PayItem",
+                        verbose_name="项目id",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '退款记录',
-                'verbose_name_plural': '退款记录',
-                'db_table': 'refund_record',
+                "verbose_name": "退款记录",
+                "verbose_name_plural": "退款记录",
+                "db_table": "refund_record",
             },
         ),
         migrations.CreateModel(
-            name='PayType',
+            name="PayType",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, verbose_name='类型名')),
-                ('price', models.FloatField(verbose_name='价格')),
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('modify_time', models.DateTimeField(auto_now_add=True, null=True, verbose_name='修改时间')),
-                ('creator', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='created_pay_types', to=settings.AUTH_USER_MODEL, verbose_name='创建者id')),
-                ('modifier', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='modified_pay_types', to=settings.AUTH_USER_MODEL, verbose_name='修改者id')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=256, verbose_name="类型名")),
+                ("price", models.FloatField(verbose_name="价格")),
+                (
+                    "create_time",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="创建时间"
+                    ),
+                ),
+                (
+                    "modify_time",
+                    models.DateTimeField(
+                        auto_now_add=True, null=True, verbose_name="修改时间"
+                    ),
+                ),
+                (
+                    "creator",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="created_pay_types",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="创建者id",
+                    ),
+                ),
+                (
+                    "modifier",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="modified_pay_types",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="修改者id",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '缴费类型',
-                'verbose_name_plural': '缴费类型',
-                'db_table': 'pay_type',
+                "verbose_name": "缴费类型",
+                "verbose_name_plural": "缴费类型",
+                "db_table": "pay_type",
             },
         ),
         migrations.CreateModel(
-            name='PayRecord',
+            name="PayRecord",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('receive', models.FloatField(verbose_name='收款金额')),
-                ('refund', models.FloatField(verbose_name='找零')),
-                ('method', models.IntegerField(choices=0, default=0, verbose_name='收款方式')),
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('creator', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='created_pay_records', to=settings.AUTH_USER_MODEL, verbose_name='创建者id')),
-                ('patient', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='paid_records', to=settings.AUTH_USER_MODEL, verbose_name='病人id')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("receive", models.FloatField(verbose_name="收款金额")),
+                ("refund", models.FloatField(verbose_name="找零")),
+                (
+                    "method",
+                    models.IntegerField(
+                        choices=0, default=0, verbose_name="收款方式"
+                    ),
+                ),
+                (
+                    "create_time",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="创建时间"
+                    ),
+                ),
+                (
+                    "creator",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="created_pay_records",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="创建者id",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="paid_records",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="病人id",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '缴费记录',
-                'verbose_name_plural': '缴费记录',
-                'db_table': 'pay_record',
+                "verbose_name": "缴费记录",
+                "verbose_name_plural": "缴费记录",
+                "db_table": "pay_record",
             },
         ),
         migrations.AddField(
-            model_name='payitem',
-            name='pay_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='items', to='Finance.PayType', verbose_name='缴费项目id'),
+            model_name="payitem",
+            name="pay_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="items",
+                to="Finance.PayType",
+                verbose_name="缴费项目id",
+            ),
         ),
         migrations.AddField(
-            model_name='payitem',
-            name='record',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='items', to='Finance.PayRecord', verbose_name='缴费单id'),
+            model_name="payitem",
+            name="record",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="items",
+                to="Finance.PayRecord",
+                verbose_name="缴费单id",
+            ),
         ),
         migrations.CreateModel(
-            name='AuditRecord',
+            name="AuditRecord",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('result', models.IntegerField(choices=[(0, '通过'), (1, '未通过')], default=0, verbose_name='审核结果')),
-                ('commet', models.CharField(blank=True, max_length=256, null=True, verbose_name='备注')),
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='申请时间')),
-                ('audit_time', models.DateTimeField(auto_now_add=True, verbose_name='审核时间')),
-                ('applicant', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='applied_records', to=settings.AUTH_USER_MODEL, verbose_name='申请者id')),
-                ('auditor', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='audited_records', to=settings.AUTH_USER_MODEL, verbose_name='审核者id')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "result",
+                    models.IntegerField(
+                        choices=[(0, "通过"), (1, "未通过")],
+                        default=0,
+                        verbose_name="审核结果",
+                    ),
+                ),
+                (
+                    "commet",
+                    models.CharField(
+                        blank=True, max_length=256, null=True, verbose_name="备注"
+                    ),
+                ),
+                (
+                    "create_time",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="申请时间"
+                    ),
+                ),
+                (
+                    "audit_time",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="审核时间"
+                    ),
+                ),
+                (
+                    "applicant",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="applied_records",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="申请者id",
+                    ),
+                ),
+                (
+                    "auditor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="audited_records",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="审核者id",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '结算审核记录',
-                'verbose_name_plural': '结算审核记录',
-                'db_table': 'audit_record',
+                "verbose_name": "结算审核记录",
+                "verbose_name_plural": "结算审核记录",
+                "db_table": "audit_record",
             },
         ),
         migrations.CreateModel(
-            name='AuditItem',
+            name="AuditItem",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('audit', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='items', to='Finance.AuditRecord', verbose_name='审核id')),
-                ('receive', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='audit_items', to='Finance.PayRecord', verbose_name='收款条目id')),
-                ('refund', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='audit_items', to='Finance.RefundRecord', verbose_name='退款条目')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "audit",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="items",
+                        to="Finance.AuditRecord",
+                        verbose_name="审核id",
+                    ),
+                ),
+                (
+                    "receive",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="audit_items",
+                        to="Finance.PayRecord",
+                        verbose_name="收款条目id",
+                    ),
+                ),
+                (
+                    "refund",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="audit_items",
+                        to="Finance.RefundRecord",
+                        verbose_name="退款条目",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '结算条目',
-                'verbose_name_plural': '结算条目',
-                'db_table': 'audit_item',
+                "verbose_name": "结算条目",
+                "verbose_name_plural": "结算条目",
+                "db_table": "audit_item",
             },
         ),
     ]

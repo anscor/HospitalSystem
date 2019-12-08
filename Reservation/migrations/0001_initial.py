@@ -10,57 +10,140 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0011_update_proxy_permissions'),
+        ("auth", "0011_update_proxy_permissions"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ReservationTime',
+            name="ReservationTime",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('start', models.TimeField(verbose_name='开始时间')),
-                ('end', models.TimeField(verbose_name='结束时间')),
-                ('patient_num', models.IntegerField(verbose_name='此时间段内最大可接待患者数')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("start", models.TimeField(verbose_name="开始时间")),
+                ("end", models.TimeField(verbose_name="结束时间")),
+                (
+                    "patient_num",
+                    models.IntegerField(verbose_name="此时间段内最大可接待患者数"),
+                ),
             ],
             options={
-                'verbose_name': '预约时间段',
-                'verbose_name_plural': '预约时间段',
-                'db_table': 'reservation_time',
+                "verbose_name": "预约时间段",
+                "verbose_name_plural": "预约时间段",
+                "db_table": "reservation_time",
             },
         ),
         migrations.CreateModel(
-            name='Visit',
+            name="Visit",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateField(verbose_name='坐诊日期')),
-                ('start', models.TimeField(verbose_name='坐诊开始时间')),
-                ('end', models.TimeField(verbose_name='坐诊结束时间')),
-                ('patient_num', models.IntegerField(verbose_name='最大可接待患者数')),
-                ('doctor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='visits', to=settings.AUTH_USER_MODEL, verbose_name='医生id')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date", models.DateField(verbose_name="坐诊日期")),
+                ("start", models.TimeField(verbose_name="坐诊开始时间")),
+                ("end", models.TimeField(verbose_name="坐诊结束时间")),
+                ("patient_num", models.IntegerField(verbose_name="最大可接待患者数")),
+                (
+                    "doctor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="visits",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="医生id",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '专家坐诊时间',
-                'verbose_name_plural': '专家坐诊时间',
-                'db_table': 'visit',
+                "verbose_name": "专家坐诊时间",
+                "verbose_name_plural": "专家坐诊时间",
+                "db_table": "visit",
             },
         ),
         migrations.CreateModel(
-            name='Reservation',
+            name="Reservation",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateField(verbose_name='预约日期')),
-                ('is_cancel', models.BooleanField(choices=[(0, '否'), (1, '是')], default=0, verbose_name='是否取消')),
-                ('is_expert', models.BooleanField(choices=[(0, '否'), (1, '是')], default=0, verbose_name='是否为专家号')),
-                ('department', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='reservations', to='auth.Group', verbose_name='科室id')),
-                ('doctor', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='be_reservations', to=settings.AUTH_USER_MODEL, verbose_name='医生id')),
-                ('patient', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='reservations', to=settings.AUTH_USER_MODEL, verbose_name='病人id')),
-                ('time', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='reservations', to='Reservation.ReservationTime', verbose_name='预约时间段')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date", models.DateField(verbose_name="预约日期")),
+                (
+                    "is_cancel",
+                    models.BooleanField(
+                        choices=[(0, "否"), (1, "是")],
+                        default=0,
+                        verbose_name="是否取消",
+                    ),
+                ),
+                (
+                    "is_expert",
+                    models.BooleanField(
+                        choices=[(0, "否"), (1, "是")],
+                        default=0,
+                        verbose_name="是否为专家号",
+                    ),
+                ),
+                (
+                    "department",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="reservations",
+                        to="auth.Group",
+                        verbose_name="科室id",
+                    ),
+                ),
+                (
+                    "doctor",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="be_reservations",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="医生id",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="reservations",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="病人id",
+                    ),
+                ),
+                (
+                    "time",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="reservations",
+                        to="Reservation.ReservationTime",
+                        verbose_name="预约时间段",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '预约记录',
-                'verbose_name_plural': '预约记录',
-                'db_table': 'reservation',
+                "verbose_name": "预约记录",
+                "verbose_name_plural": "预约记录",
+                "db_table": "reservation",
             },
         ),
     ]

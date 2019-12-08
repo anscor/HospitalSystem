@@ -11,78 +11,256 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('auth', '0011_update_proxy_permissions'),
+        ("auth", "0011_update_proxy_permissions"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Occupation',
+            name="Occupation",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='职业名')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="职业名")),
             ],
             options={
-                'verbose_name': '职业列表',
-                'verbose_name_plural': '职业列表',
-                'db_table': 'occupation',
+                "verbose_name": "职业列表",
+                "verbose_name_plural": "职业列表",
+                "db_table": "occupation",
             },
         ),
         migrations.CreateModel(
-            name='UserProfile',
+            name="UserProfile",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('age', models.IntegerField(verbose_name='年龄')),
-                ('name', models.CharField(max_length=64, verbose_name='用户名称')),
-                ('name_pinyin', models.CharField(max_length=255, verbose_name='用户名拼音')),
-                ('gender', models.IntegerField(choices=[(0, '女'), (1, '男')], verbose_name='性别')),
-                ('identify_id', models.CharField(max_length=18, verbose_name='身份证号')),
-                ('phone', models.CharField(blank=True, max_length=13, null=True, verbose_name='联系电话')),
-                ('address', models.CharField(blank=True, max_length=256, null=True, verbose_name='住址')),
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('modify_time', models.DateTimeField(auto_now_add=True, null=True, verbose_name='修改时间')),
-                ('creator', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='created_user_profiles', to=settings.AUTH_USER_MODEL, verbose_name='创建者id')),
-                ('modifier', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='modified_user_profiles', to=settings.AUTH_USER_MODEL, verbose_name='修改者id')),
-                ('occupation', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='users', to='User.Occupation', verbose_name='职业id')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL, verbose_name='用户id')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("age", models.IntegerField(verbose_name="年龄")),
+                ("name", models.CharField(max_length=64, verbose_name="用户名称")),
+                (
+                    "name_pinyin",
+                    models.CharField(max_length=255, verbose_name="用户名拼音"),
+                ),
+                (
+                    "gender",
+                    models.IntegerField(
+                        choices=[(0, "女"), (1, "男")], verbose_name="性别"
+                    ),
+                ),
+                (
+                    "identify_id",
+                    models.CharField(max_length=18, verbose_name="身份证号"),
+                ),
+                (
+                    "phone",
+                    models.CharField(
+                        blank=True,
+                        max_length=13,
+                        null=True,
+                        verbose_name="联系电话",
+                    ),
+                ),
+                (
+                    "address",
+                    models.CharField(
+                        blank=True, max_length=256, null=True, verbose_name="住址"
+                    ),
+                ),
+                (
+                    "create_time",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="创建时间"
+                    ),
+                ),
+                (
+                    "modify_time",
+                    models.DateTimeField(
+                        auto_now_add=True, null=True, verbose_name="修改时间"
+                    ),
+                ),
+                (
+                    "creator",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="created_user_profiles",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="创建者id",
+                    ),
+                ),
+                (
+                    "modifier",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="modified_user_profiles",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="修改者id",
+                    ),
+                ),
+                (
+                    "occupation",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="users",
+                        to="User.Occupation",
+                        verbose_name="职业id",
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="profile",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="用户id",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '用户信息',
-                'verbose_name_plural': '用户信息',
-                'db_table': 'user_profile',
+                "verbose_name": "用户信息",
+                "verbose_name_plural": "用户信息",
+                "db_table": "user_profile",
             },
         ),
         migrations.CreateModel(
-            name='UserLogRecord',
+            name="UserLogRecord",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('ip', models.GenericIPAddressField(blank=True, null=True, verbose_name='IP地址')),
-                ('operation', models.IntegerField(choices=[(0, '登录'), (1, '登出')], verbose_name='操作类型')),
-                ('operate_time', models.DateTimeField(auto_now=True, verbose_name='操作时间')),
-                ('operator', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='operations', to=settings.AUTH_USER_MODEL, verbose_name='操作者id')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='logs', to=settings.AUTH_USER_MODEL, verbose_name='用户id')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "ip",
+                    models.GenericIPAddressField(
+                        blank=True, null=True, verbose_name="IP地址"
+                    ),
+                ),
+                (
+                    "operation",
+                    models.IntegerField(
+                        choices=[(0, "登录"), (1, "登出")], verbose_name="操作类型"
+                    ),
+                ),
+                (
+                    "operate_time",
+                    models.DateTimeField(auto_now=True, verbose_name="操作时间"),
+                ),
+                (
+                    "operator",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="operations",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="操作者id",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="logs",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="用户id",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '用户登录相关日志记录',
-                'verbose_name_plural': '用户登录相关日志记录',
-                'db_table': 'user_log_record',
+                "verbose_name": "用户登录相关日志记录",
+                "verbose_name_plural": "用户登录相关日志记录",
+                "db_table": "user_log_record",
             },
         ),
         migrations.CreateModel(
-            name='GroupProfile',
+            name="GroupProfile",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('location', models.CharField(blank=True, max_length=255, null=True, verbose_name='位置')),
-                ('contact_phone', models.CharField(blank=True, max_length=12, null=True, verbose_name='联系电话')),
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('modify_time', models.DateTimeField(auto_now_add=True, null=True, verbose_name='修改时间')),
-                ('creator', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='created_group_profiles', to=settings.AUTH_USER_MODEL, verbose_name='创建者id')),
-                ('group', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to='auth.Group', verbose_name='组id')),
-                ('modifier', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='modified_group_profiles', to=settings.AUTH_USER_MODEL, verbose_name='修改者id')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "location",
+                    models.CharField(
+                        blank=True, max_length=255, null=True, verbose_name="位置"
+                    ),
+                ),
+                (
+                    "contact_phone",
+                    models.CharField(
+                        blank=True,
+                        max_length=12,
+                        null=True,
+                        verbose_name="联系电话",
+                    ),
+                ),
+                (
+                    "create_time",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="创建时间"
+                    ),
+                ),
+                (
+                    "modify_time",
+                    models.DateTimeField(
+                        auto_now_add=True, null=True, verbose_name="修改时间"
+                    ),
+                ),
+                (
+                    "creator",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="created_group_profiles",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="创建者id",
+                    ),
+                ),
+                (
+                    "group",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="profile",
+                        to="auth.Group",
+                        verbose_name="组id",
+                    ),
+                ),
+                (
+                    "modifier",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="modified_group_profiles",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="修改者id",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '组信息',
-                'verbose_name_plural': '组信息',
-                'db_table': 'group_profile',
+                "verbose_name": "组信息",
+                "verbose_name_plural": "组信息",
+                "db_table": "group_profile",
             },
         ),
     ]

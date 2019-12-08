@@ -16,7 +16,7 @@ from Reservation.models import *
 
 
 def generateSerializers():
-    app = get_app('User')
+    app = get_app("User")
     for model in get_models(app):
         print(model.name)
 
@@ -25,6 +25,6 @@ def generateViewSets():
     pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     generateSerializers()
     pass
