@@ -61,9 +61,10 @@ class Visit(models.Model):
     end = models.TimeField(verbose_name='坐诊结束时间')
 
     patient_num = models.IntegerField(verbose_name='最大可接待患者数')
+    room = models.CharField(max_length=16, null=True,
+                            blank=True, verbose_name='坐诊房间号')
 
     class Meta:
         verbose_name = '专家坐诊时间'
         verbose_name_plural = '专家坐诊时间'
         db_table = 'visit'
-
