@@ -101,7 +101,7 @@ class PrescriptionItem(models.Model):
         verbose_name="处方id",
     )
     medicine = models.ForeignKey(
-        "Medicine.Medicine",
+        "medicine.Medicine",
         on_delete=models.DO_NOTHING,
         related_name="prescription_items",
         verbose_name="药物id",

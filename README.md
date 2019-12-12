@@ -6,6 +6,7 @@
 - djangorestframework: 3.10.3
 - pypinyin: 0.36.0
 - mysqlclient: 1.4.6
+- djangorestframework-jwt: 1.11.0
 
 格式化工具为autopep8 1.4.4
 
