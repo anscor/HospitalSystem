@@ -17,17 +17,6 @@ class GroupSerializer(serializers.ModelSerializer):
         model = Group
         fields = ["id", "name", "profile"]
 
-    def create(self, validated_data):
-        profile_data = validated_data.pop("profile", None)
-        group = Group.objects.create(**validated_data)
-        if profile_data:
-            profile_data["group"] = group
-            GroupProfile.objects.create(**profile_data)
-        return group
-
-    def update(self, instance, validated_data):
-        return super().update(instance, validated_data)
-
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -61,19 +50,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "email", "password", "profile"]
         extra_kwargs = {"password": {"write_only": True}}
         read_only_fields = ["id"]
-
-    def create(self, validated_data):
-        profile_data = validated_data.pop("profile", None)
-        user = User(
-            username=validated_data.get("username"),
-            email=validated_data.get("email", ""),
-        )
-        user.set_password(validated_data.get("password", "123456"))
-        user.save()
-        if profile_data:
-            profile_data["user"] = user
-            UserProfile.objects.create(**profile_data)
-        return user
 
     # def update(self, instance, validated_data):
 

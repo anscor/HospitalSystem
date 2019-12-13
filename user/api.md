@@ -2,30 +2,46 @@
 
 ### 用户注册
 
-**POST** /api/auth/register/
+**POST** /api/users/
 
 #### 请求参数
 
 ```json
 {
-    "username": "username",
-    "password": "password",
-    "email": "email",	// 可为空，但必须传递此字段
-    "gender": 0,		// 0表示女，1表示男
-    "occuption": 1,		// 职业或分组
-    "age": 10,
-    "name": "name",
-    "identify_id": "xxxxxx",	// 身份证号
-    "phone": "111xxxxxxxx",
-    "address": "address"
+    "username": "test1",
+    "password": "password1",
+    "email": "email1@test.com",
+    "profile": {
+        "gender": 0,
+        "occupation": 34,
+        "age": 18,
+        "name": "name",
+        "identify_id": "100000190001010001",
+        "phone": "18888888888",
+        "address": "address1"
+    }
 }
 ```
 
 #### 返回参数
 
+##### 成功时 200
+
+```json
+
+```
+
+##### 失败时 400 
+
+```json
+{
+    "detail": "错误信息！"
+}
+```
+
 ### 用户登录
 
-**POST** /api/auth/login/
+**POST** /api/auth/
 
 #### 请求参数
 
