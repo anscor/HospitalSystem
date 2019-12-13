@@ -2,7 +2,8 @@
 
 | 请求方法 | 地址                         | 说明                       |
 | :------- | :--------------------------- | :------------------------- |
-| POST     | /api/auth/login/             | 用户登录                   |
+| POST     | /api/auth/                   | 用户登录                   |
+| POST     | /api/auth/refresh/           | 刷新token                  |
 | GET      | /api/auth/logout/            | 用户登出                   |
 | POST     | /api/users/                  | 用户注册                   |
 | GET      | /api/users/                  | 所有用户信息               |

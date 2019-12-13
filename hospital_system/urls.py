@@ -1,6 +1,7 @@
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework import routers
 
 from finance.urls import router as finance_router
@@ -10,7 +11,7 @@ from outpatient.urls import router as outpatient_router
 from reservation.urls import router as reservation_router
 from user.urls import router as user_router
 
-router = routers.SimpleRouter()
+router = routers.DefaultRouter()
 
 router.registry.extend(finance_router.registry)
 router.registry.extend(laboratory_router.registry)
@@ -21,6 +22,7 @@ router.registry.extend(user_router.registry)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/auth/", obtain_jwt_token),
     path("api/", include(router.urls)),
+    path("api/auth/", TokenObtainPairView.as_view()),
+    path("api/auth/refresh/", TokenRefreshView.as_view()),
 ]
