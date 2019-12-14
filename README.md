@@ -7,6 +7,7 @@
 - pypinyin: 0.36.0
 - mysqlclient: 1.4.6
 - djangorestframework_simplejwt: 4.4.0
+- django-cors-headers: 3.2.0
 
 格式化工具为autopep8 1.4.4
 
