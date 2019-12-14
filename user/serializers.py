@@ -33,12 +33,21 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         name = validated_data.pop("name", None)
+        validated_data.pop("name_pinyin", None)
+
+        instance.gender = validated_data.get("gender", instance.gender)
+        instance.occupation = validated_data.get("occupation", instance.occupation)
+        instance.age = validated_data.get("age", instance.age)
+        instance.identify_id = validated_data.get("identify_id", instance.identify_id)
+        instance.phone = validated_data.get("phone", instance.phone)
+        instance.address = validated_data.get("address", instance.address)
+        instance.modifier = validated_data.get("modifier", instance.modifier)
+        
         if name:
             instance.name = name
             instance.name_pinyin = "".join(lazy_pinyin(name))
         instance.save()
 
-        UserProfile.objects.update(instance, **validated_data)
         return instance
 
 
@@ -51,11 +60,26 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True}}
         read_only_fields = ["id"]
 
-    # def update(self, instance, validated_data):
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data.get("username"),
+            password=validated_data.get("password"),
+        )
+        email = validated_data.get("email", None)
+        if email:
+            user.email = email
+            user.save()
+        return user
 
-    #     password = validated_data.pop('password', None)
-    #     if password:
-    #         instance.set_password(password)
-    #     instance.sava()
-    #     User.objects.update(instance, **validated_data)
-    #     return instance
+    def update(self, instance, validated_data):
+        password = validated_data.get("password", None)
+        email = validated_data.get("email", None)
+
+        if password:
+            instance.set_password(password)
+
+        if email:
+            instance.email = email
+
+        instance.save()
+        return instance

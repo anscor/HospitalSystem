@@ -1,28 +1,63 @@
+## 总述
+
+### 接口权限验证
+
+管理员拥有所有接口访问权限。在接口说明不再单独说明。
+
+以下列出所有API除用户登录、用户注册、刷新token外，其余接口均需以token方式进行登录验证。token提供方式如下：
+
+```http
+DELETE /api/users/8/ HTTP/1.1
+Host: 127.0.0.1:8000
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTc2MjkzMTQ4LCJqdGkiOiIyMGQxNzNiODA1NGE0NWU3OGRkYmY0NjBhNzAwNTg0MSIsInVzZXJfaWQiOjF9.COb9ts0SDLUCd9f46sUVKRtGLNep7EsFrvegja38Vuc
+```
+
+如果未提供token或token过期、不合法等，会得到401响应，返回如下信息：
+
+```json
+"token过期、不合法": {
+    "detail": "Given token not valpk for any token type",
+    "code": "token_not_valpk",
+    "messages": [
+        {
+            "token_class": "AccessToken",
+            "token_type": "access",
+            "message": "Token is invalpk or expired"
+        }
+    ]
+},
+"未提供token": {
+    "detail": "身份认证信息未提供。"
+}
+```
+
 ## 用户模块
 
-| 请求方法 | 地址                         | 说明                       |
-| :------- | :--------------------------- | :------------------------- |
-| POST     | /api/auth/                   | 用户登录                   |
-| POST     | /api/auth/refresh/           | 刷新token                  |
-| GET      | /api/auth/logout/            | 用户登出                   |
-| POST     | /api/users/                  | 用户注册                   |
-| GET      | /api/users/                  | 所有用户信息               |
-| GET      | /api/users/{id}/             | 某个用户信息               |
-| GET      | /api/groups/                 | 所有组信息                 |
-| POST     | /api/groups/                 | 添加组                     |
-| GET      | /api/groups/{id}/            | 某个组信息                 |
-| GET      | /api/groups/{id}/users/      | 某个组下的所有用户信息     |
-| GET      | /api/users/{id}/groups/      | 某个用户所属的所有组       |
-| POST     | /api/groups/{id}/users/      | 为某个组添加用户           |
-| POST     | /api/users/{id}/groups/      | 为某个用户添加所属组       |
-| GET      | /api/occupations/            | 所有职业信息               |
-| POST     | /api/occupations/            | 创建职业信息               |
-| GET      | /api/occupations/{id}/       | 某个职业的信息             |
-| GET      | /api/occupations/{id}/users/ | 某个职业下的所有用户       |
-| GET      | /api/user-logs/              | 所有登入登出记录           |
-| GET      | /api/user-logs/{id}/         | 某条登入登出记录           |
-| GET      | /api/users/{id}/user-logs/   | 某个用户的所有登入登出记录 |
-| GET      | /api/black-list/             | 病人黑名单                 |
+| 请求方法 | 地址                         | 说明                                 |
+| :------- | :--------------------------- | :----------------------------------- |
+| POST     | /api/auth/                   | 用户登录（完成）                     |
+| POST     | /api/auth/refresh/           | 刷新token（完成）                    |
+| GET      | /api/auth/logout/            | 用户登出（完成）                     |
+| POST     | /api/users/                  | 用户注册（完成）                     |
+| GET      | /api/users/                  | 所有用户信息（管理员可用）（完成）   |
+| GET      | /api/users/{pk}/             | 某个用户信息（本人可用）（完成）     |
+| DELETE   | /api/users/{pk}/             | 删除某个用户（管理员可用）（完成）   |
+| PUT      | /api/users/{pk}/             | 更新某个用户信息（本人可用）（完成） |
+| GET      | /api/groups/                 | 所有组信息（管理员可用）             |
+| POST     | /api/groups/                 | 添加组                               |
+| GET      | /api/groups/{pk}/            | 某个组信息                           |
+| GET      | /api/groups/{pk}/users/      | 某个组下的所有用户信息               |
+| GET      | /api/users/{pk}/groups/      | 某个用户所属的所有组                 |
+| POST     | /api/groups/{pk}/users/      | 为某个组添加用户                     |
+| POST     | /api/users/{pk}/groups/      | 为某个用户添加所属组                 |
+| GET      | /api/occupations/            | 所有职业信息                         |
+| POST     | /api/occupations/            | 创建职业信息                         |
+| GET      | /api/occupations/{pk}/       | 某个职业的信息                       |
+| GET      | /api/occupations/{pk}/users/ | 某个职业下的所有用户                 |
+| GET      | /api/user-logs/              | 所有登入登出记录                     |
+| GET      | /api/user-logs/{pk}/         | 某条登入登出记录                     |
+| GET      | /api/users/{pk}/user-logs/   | 某个用户的所有登入登出记录           |
+| GET      | /api/black-list/             | 病人黑名单                           |
 
 ## 门诊模块
 

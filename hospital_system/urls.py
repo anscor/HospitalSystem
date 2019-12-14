@@ -11,6 +11,8 @@ from outpatient.urls import router as outpatient_router
 from reservation.urls import router as reservation_router
 from user.urls import router as user_router
 
+from user.views import logout
+
 router = routers.DefaultRouter()
 
 router.registry.extend(finance_router.registry)
@@ -25,4 +27,5 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("api/auth/", TokenObtainPairView.as_view()),
     path("api/auth/refresh/", TokenRefreshView.as_view()),
+    path("api/auth/logout/", logout.as_view()),
 ]

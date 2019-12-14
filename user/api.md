@@ -28,7 +28,9 @@
 ##### 成功时 200
 
 ```json
-
+{
+    "detail": "注册成功！"
+}
 ```
 
 ##### 失败时 400 
@@ -54,6 +56,54 @@
 
 #### 返回参数
 
+##### 成功时 200
+
+```json
+{
+    "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTU3Njg5NjAwNywianRpIjoiMThmZDU3MzMxNzQ0NGM4ZGIzNTU4MTllYjE4MjUyYTEiLCJ1c2VyX2lkIjo3fQ.-xBt27NlNZ_fJYbar0es62pQZoZp9IhDcS01U3fpIYo",
+    "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTc2Mjk0ODA3LCJqdGkiOiJiNjhmMWIyMGEzMWY0YTIwOTUyMDhjYjNlM2NhMjM2YSIsInVzZXJfaWQiOjd9.OaJNTGpZm-pPYzfJCgk0JhBM0LTqBu4C0vBuj2EImjQ"
+}
+```
+
+`refresh`用于刷新token（7天过期），`access`用于带在请求头上进行登录验证（60分钟过期）。
+
+##### 失败时 401 400
+
+```json
+{
+    "detail": "No active account found with the given credentials"
+}
+```
+
+```json
+{
+    "username": [
+        "该字段不能为空。"
+    ],
+    "password": [
+        "该字段不能为空。"
+    ]
+}
+```
+
+#### 示例
+
+```http
+POST /api/auth/ HTTP/1.1
+Host: 127.0.0.1:8000
+Content-Type: application/x-www-form-urlencoded
+Cache-Control: no-cache
+
+username=test1&password=password1
+```
+
+```json
+{
+    "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTU3Njg5NjAwNywianRpIjoiMThmZDU3MzMxNzQ0NGM4ZGIzNTU4MTllYjE4MjUyYTEiLCJ1c2VyX2lkIjo3fQ.-xBt27NlNZ_fJYbar0es62pQZoZp9IhDcS01U3fpIYo",
+    "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTc2Mjk0ODA3LCJqdGkiOiJiNjhmMWIyMGEzMWY0YTIwOTUyMDhjYjNlM2NhMjM2YSIsInVzZXJfaWQiOjd9.OaJNTGpZm-pPYzfJCgk0JhBM0LTqBu4C0vBuj2EImjQ"
+}
+```
+
 ### 所有用户信息
 
 **GET** /api/users/
@@ -64,38 +114,169 @@
 
 #### 返回参数
 
+##### 成功时 200
+
 ```json
 [
     {
         "id": 1,
         "username": "username",
-        ...
+        "email": "",
+        "profile": null
     },
     {
         "id": 2,
         "username": "username",
-        ...
+        "email": "",
+        "profile": {
+            "age": 18,
+            "name": "name",
+            ...
+        }
     },
     ...
 ]
 ```
 
-### 某一个用户的信息
+##### 失败时 403 401
 
-**GET** /api/users/{id}/
-
-#### 请求参数
-
-无
-
-#### 返回参数
+403
 
 ```json
 {
-    "id": 1,
-    "username": "username",
-    ...
-},
+    "detail": "您没有执行该操作的权限。"
+}
+```
+
+#### 示例
+
+```http
+GET /api/users/ HTTP/1.1
+Host: 127.0.0.1:8000
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTc2MjkzMTQ4LCJqdGkiOiIyMGQxNzNiODA1NGE0NWU3OGRkYmY0NjBhNzAwNTg0MSIsInVzZXJfaWQiOjF9.COb9ts0SDLUCd9f46sUVKRtGLNep7EsFrvegja38Vuc
+Cache-Control: no-cache
+```
+
+```json
+[
+    {
+        "id": 1,
+        "username": "anscor",
+        "email": "",
+        "profile": null
+    },
+    {
+        "id": 2,
+        "username": "default",
+        "email": "",
+        "profile": null
+    },
+    {
+        "id": 7,
+        "username": "test1",
+        "email": "email1@test.com",
+        "profile": {
+            "age": 18,
+            "name": "name",
+            "name_pinyin": "name",
+            "gender": 0,
+            "identify_id": "100000190001010001",
+            "phone": "18888888888",
+            "address": "address1",
+            "create_time": "2019-12-14T00:08:16.967537",
+            "modify_time": "2019-12-14T00:08:16.967537",
+            "user": 7,
+            "occupation": 34,
+            "creator": 7,
+            "modifier": null
+        }
+    }
+]
+```
+
+### 某一个用户的信息
+
+**GET** /api/users/{pk}/
+
+#### 请求参数
+
+- pk：用户id。
+
+#### 返回参数
+
+##### 成功时 200
+
+```json
+{
+    "id": 7,
+    "username": "test1",
+    "email": "email1@test.com",
+    "profile": {
+        "age": 18,
+        "name": "name",
+        "name_pinyin": "name",
+        "gender": 0,
+        "identify_id": "100000190001010001",
+        "phone": "18888888888",
+        "address": "address1",
+        "create_time": "2019-12-14T00:08:16.967537",
+        "modify_time": "2019-12-14T00:08:16.967537",
+        "user": 7,
+        "occupation": 34,
+        "creator": 7,
+        "modifier": null
+    }
+}
+```
+
+##### 失败时 400 403
+
+```json
+{
+    "detail": "错误信息"
+}
+```
+
+### 更新某个用户信息
+
+**PUT** /api/users/{pk}/
+
+#### 请求参数
+
+- pk：用户id。
+
+```json
+{
+    "password": "password1",
+    "email": "email1@test.com",
+    "profile": {
+        "gender": 0,
+        "occupation": 34,
+        "age": 18,
+        "name": "name",
+        "identify_id": "100000190001010001",
+        "phone": "18888888888",
+        "address": "address1"
+    }
+}
+```
+
+#### 返回参数
+
+##### 成功时 200
+
+```json
+{
+    "detail": "更改用户信息成功！"
+}
+```
+
+##### 失败时 400 403
+
+```json
+{
+    "detail": "错误信息！"
+}
 ```
 
 ### 所有组别信息
@@ -130,7 +311,7 @@
 
 ### 某一个组的详细信息
 
-**GET** /api/groups/{id}/
+**GET** /api/groups/{pk}/
 
 #### 请求参数
 
@@ -150,7 +331,7 @@
 
 ### 某个组下的所有用户信息
 
-**GET** /api/groups/{id}/users/
+**GET** /api/groups/{pk}/users/
 
 #### 请求参数
 
@@ -176,7 +357,7 @@
 
 ### 某个用户所属的所有组
 
-**GET** /api/users/{id}/groups/
+**GET** /api/users/{pk}/groups/
 
 #### 请求参数
 
@@ -244,7 +425,7 @@
 
 ### 某个职业
 
-**GET** /api/occupations/{id}/
+**GET** /api/occupations/{pk}/
 
 #### 请求参数
 
@@ -261,7 +442,7 @@
 
 ### 某个职业下的所有用户
 
-**GET** /api/occupations/{id}/users/
+**GET** /api/occupations/{pk}/users/
 
 #### 请求参数
 
@@ -319,7 +500,7 @@
 
 ### 某条登入或登出记录
 
-**GET** /api/user-logs/{id}/
+**GET** /api/user-logs/{pk}/
 
 #### 请求参数
 
@@ -340,7 +521,7 @@
 
 ### 某个用户的所有登入登出记录
 
-**GET** /api/users/{id}/user-logs/
+**GET** /api/users/{pk}/user-logs/
 
 #### 请求参数
 
