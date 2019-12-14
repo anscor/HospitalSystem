@@ -96,12 +96,6 @@ class OccupationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class UserLogRecordSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserLogRecord
-        fields = "__all__"
-
-
 class BlackListSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlackList

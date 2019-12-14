@@ -111,37 +111,6 @@ class GroupProfile(models.Model):
         db_table = "group_profile"
 
 
-class UserLogRecord(models.Model):
-    # 被操作者
-    user = models.ForeignKey(
-        User,
-        on_delete=models.DO_NOTHING,
-        related_name="logs",
-        verbose_name="用户id",
-    )
-
-    ip = models.GenericIPAddressField(
-        null=True, blank=True, verbose_name="IP地址"
-    )
-
-    OPERATION = ((0, "登录"), (1, "登出"))
-    operation = models.IntegerField(choices=OPERATION, verbose_name="操作类型")
-
-    # 操作者，一般而言与user相同，但有可能是管理员操作（user被动下线等）
-    operator = models.ForeignKey(
-        User,
-        on_delete=models.DO_NOTHING,
-        related_name="operations",
-        verbose_name="操作者id",
-    )
-    operate_time = models.DateTimeField(auto_now=True, verbose_name="操作时间")
-
-    class Meta:
-        verbose_name = "用户登录相关日志记录"
-        verbose_name_plural = "用户登录相关日志记录"
-        db_table = "user_log_record"
-
-
 class BlackList(models.Model):
     patient = models.OneToOneField(
         User,

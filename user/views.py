@@ -327,32 +327,6 @@ class OccupationViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
 
-class UserLogRecordViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = UserLogRecord.objects.all()
-    serializer_class = UserLogRecordSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    @wrap_permission(permissions.IsAdminUser)
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-
-    def retrieve(self, request, *args, **kwargs):
-
-        log = UserLogRecord.objects.filter(id=self.kwargs.get("pk"))
-        if not log:
-            return Response(
-                data={"detail": "记录不存在！"}, status=status.HTTP_404_NOT_FOUND
-            )
-        log = log[0]
-        if log.user != request.user:
-            return Response(
-                data={"detail": "无权限访问！"}, status=status.HTTP_403_FORBIDDEN
-            )
-
-        ser = UserLogRecordSerializer(log)
-        return Response(data=ser.data, status=status.HTTP_200_OK)
-
-
 class BlackListViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = BlackList.objects.all()
     serializer_class = BlackListSerializer
