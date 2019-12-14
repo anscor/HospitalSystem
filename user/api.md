@@ -11,6 +11,7 @@
     "username": "test1",
     "password": "password1",
     "email": "email1@test.com",
+    "group": 123,  // 可以不传，不传时设置为病人
     "profile": {
         "gender": 0,
         "occupation": 34,
@@ -24,7 +25,7 @@
 
 #### 返回参数
 
-##### 成功时 200 400
+##### 200 400
 
 ### 用户登录
 

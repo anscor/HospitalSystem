@@ -2,7 +2,7 @@ from .models import *
 from .serializers import *
 
 from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import permission_classes
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.views import APIView
@@ -135,6 +135,11 @@ class GroupViewSet(viewsets.ModelViewSet):
         group.delete()
         return Response(data={"detail": "成功删除用户组！"}, status=status.HTTP_200_OK)
 
+    # @wrap_permission(permissions.IsAdminUser)
+    # @action(methods=["GET"], detail=True, url_path="users", url_name="users")
+    # def group_users(self, request, pk=None):
+
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -166,18 +171,28 @@ class UserViewSet(viewsets.ModelViewSet):
     @wrap_permission(permissions.AllowAny)
     def create(self, request, *args, **kwargs):
         data = request.data.pop("profile", None)
-
-        user_ser = UserSerializer(data=request.data)
-        if not user_ser.is_valid():
-            return Response(
-                data={"detail": "参数错误！"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
+        group_id = request.data.pop("group", None)
+        
         # 用户名重复
         user = User.objects.all().filter(username=request.data.get("username"))
         if user:
             return Response(
                 data={"detail": "用户已存在！"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # 用户组别，不传时默认为病人
+        group = Group.objects.all().filter(name="病人")
+        if group_id:
+            group = Group.objects.all().filter(id=group_id)
+            if not group:
+                return Response(data={"detail": "用户组不存在！"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        group = group[0]
+
+        user_ser = UserSerializer(data=request.data)
+        if not user_ser.is_valid():
+            return Response(
+                data={"detail": "参数错误！"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         user = user_ser.save()
@@ -198,6 +213,7 @@ class UserViewSet(viewsets.ModelViewSet):
         # 创建成功
         if ser.is_valid():
             ser.save()
+            group.user_set.add(user)
             return Response(
                 data={"detail": "注册成功！"}, status=status.HTTP_200_OK
             )
