@@ -33,7 +33,6 @@ class UserProfile(models.Model):
         verbose_name="职业id",
     )
 
-    age = models.IntegerField(verbose_name="年龄")
     name = models.CharField(max_length=64, verbose_name="用户名称")
     name_pinyin = models.CharField(max_length=255, verbose_name="用户名拼音")
     gender = models.IntegerField(choices=GENDER, verbose_name="性别")

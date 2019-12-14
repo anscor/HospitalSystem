@@ -40,7 +40,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.occupation = validated_data.get(
             "occupation", instance.occupation
         )
-        instance.age = validated_data.get("age", instance.age)
         instance.identify_id = validated_data.get(
             "identify_id", instance.identify_id
         )

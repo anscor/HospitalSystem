@@ -14,7 +14,6 @@
     "profile": {
         "gender": 0,
         "occupation": 34,
-        "age": 18,
         "name": "name",
         "identify_id": "100000190001010001",
         "phone": "18888888888",
@@ -121,7 +120,6 @@
         "username": "username",
         "email": "",
         "profile": {
-            "age": 18,
             "name": "name",
             ...
         }
@@ -150,7 +148,6 @@
     "username": "test1",
     "email": "email1@test.com",
     "profile": {
-        "age": 18,
         "name": "name",
         "name_pinyin": "name",
         "gender": 0,
@@ -184,7 +181,6 @@
     "profile": {
         "gender": 0,
         "occupation": 34,
-        "age": 18,
         "name": "name",
         "identify_id": "100000190001010001",
         "phone": "18888888888",
