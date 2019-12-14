@@ -354,8 +354,8 @@ class UserLogRecordViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class BlackListViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = UserLogRecord.objects.all()
-    serializer_class = UserLogRecordSerializer
+    queryset = BlackList.objects.all()
+    serializer_class = BlackListSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def retrieve(self, request, *args, **kwargs):
