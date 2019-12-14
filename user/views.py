@@ -20,6 +20,121 @@ class GroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def list(self, request, *args, **kwargs):
+        groups = Group.objects.all()
+        ser = GroupSerializer(groups, many=True)
+        return Response(data=ser.data, status=status.HTTP_200_OK)
+
+    @wrap_permission(permissions.IsAdminUser)
+    def create(self, request, *args, **kwargs):
+        profile_data = request.data.pop("profile", None)
+        ser = GroupSerializer(data=request.data)
+        if not ser.is_valid():
+            return Response(
+                data={"detail": "请求数据错误！"}, status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        group = ser.save()
+
+        if not profile_data:
+            group.delete()
+            return Response(
+                data={"detail": "请求数据错误！"}, status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        profile_data["creator"] = request.user.id
+        profile_data["group"] = group.id
+        ser = GroupProfileSerializer(data=profile_data)
+        if not ser.is_valid():
+            group.delete()
+            return Response(
+                data={"detail": "请求数据错误！"}, status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        ser.save()
+
+        return Response(data={"detail": "创建成功！"}, status=status.HTTP_200_OK)
+
+    @wrap_permission(permissions.IsAdminUser)
+    def update(self, request, *args, **kwargs):
+        profile_data = request.data.pop("profile", None)
+        group = Group.objects.filter(id=self.kwargs.get("pk"))
+        if not group:
+            return Response(
+                data={"detail": "用户组不存在！"}, status=status.HTTP_404_NOT_FOUND,
+            )
+
+        group = group[0]
+        group_ser = GroupSerializer(
+            instance=group, data=request.data, partial=True
+        )
+        if not group_ser.is_valid():
+            return Response(
+                data={"detail": "请求数据错误！"}, status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        profile = group.profile
+
+        # 更新profile
+        if profile_data and profile:
+            profile_data["modifier"] = request.user.id
+            profile_ser = GroupProfileSerializer(
+                instance=profile, data=profile_data, partial=True
+            )
+            if not profile_ser.is_valid():
+                return Response(
+                    data={"detail": "请求数据错误！"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            profile_ser.save()
+        # 创建profile
+        elif not profile and profile_data:
+            profile_data["group"] = group.id
+            profile_data["creator"] = request.user.id
+            profile_ser = GroupProfileSerializer(data=profile_data)
+            if not profile_ser.is_valid():
+                return Response(
+                    data={"detail": "请求数据错误！"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            profile_ser.save()
+        # 删除profile
+        elif not profile_data and profile:
+            profile.delete()
+
+        group_ser.save()
+        return Response(
+            data={"detail": "更改用户组信息成功！"}, status=status.HTTP_200_OK
+        )
+
+    def retrieve(self, request, *args, **kwargs):
+        group = Group.objects.filter(id=self.kwargs.get("pk"))
+        if not group:
+            return Response(
+                data={"detail": "用户组不存在！"}, status=status.HTTP_404_NOT_FOUND,
+            )
+        group = group[0]
+        ser = GroupSerializer(group)
+        return Response(ser.data, status=status.HTTP_200_OK)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @wrap_permission(permissions.IsAdminUser)
+    def destroy(self, request, *args, **kwargs):
+        group = Group.objects.filter(id=self.kwargs.get("pk"))
+        if not group:
+            return Response(
+                data={"detail": "用户组不存在！"}, status=status.HTTP_404_NOT_FOUND,
+            )
+        group = group[0]
+        profile = group.profile
+        if profile:
+            profile.delete()
+
+        group.delete()
+        return Response(data={"detail": "成功删除用户组！"}, status=status.HTTP_200_OK)
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -31,7 +146,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return (
                 Response(
                     data={"detail": "用户不存在！"},
-                    status=status.HTTP_400_BAD_REQUEST,
+                    status=status.HTTP_404_NOT_FOUND,
                 ),
                 None,
             )
@@ -121,21 +236,28 @@ class UserViewSet(viewsets.ModelViewSet):
 
         data = request.data
         data["username"] = ret.username
-        user_ser = UserSerializer(instance=ret, data=request.data, partial=True)
+        user_ser = UserSerializer(
+            instance=ret, data=request.data, partial=True
+        )
+
+        if not user_ser.is_valid():
+            return Response(
+                data={"detail": "请求数据错误！"}, status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # 更新profile
         if profile_data and profile:
             profile_data["modifier"] = request.user.id
-            ser = UserProfileSerializer(instance=profile, data=profile_data, partial=True)
+            ser = UserProfileSerializer(
+                instance=profile, data=profile_data, partial=True
+            )
             # 请求数据出错
-            if not ser.is_valid() or not user_ser.is_valid():
-                print(ser.errors)
+            if not ser.is_valid():
                 return Response(
                     data={"detail": "请求数据错误！"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             ser.save()
-            user_ser.save()
         # 删除profile
         elif not profile_data and profile:
             if not user_ser.is_valid():
@@ -144,48 +266,97 @@ class UserViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             profile.delete()
-            user_ser.save()
         # 创建profile
         elif not profile and profile_data:
             profile_data["user"] = ret.id
             profile_data["creator"] = request.user.id
             ser = UserProfileSerializer(data=profile_data)
             # 请求数据出错
-            if not ser.is_valid() or not user_ser.is_valid():
+            if not ser.is_valid():
                 return Response(
                     data={"detail": "请求数据错误！"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             ser.save()
-            user_ser.save()
-        else:
-            if not user_ser.is_valid():
-                return Response(
-                    data={"detail": "请求数据错误！"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            user_ser.save()
+        user_ser.save()
 
         return Response(
             data={"detail": "更改用户信息成功！"}, status=status.HTTP_200_OK
         )
 
     def partial_update(self, request, *args, **kwargs):
-        pass
+        return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @wrap_permission(permissions.IsAdminUser)
     def destroy(self, request, *args, **kwargs):
         user = User.objects.all().filter(id=self.kwargs.get("pk", ""))
-        if user:
-            user = user[0]
-            profile = user.profile
-            user.delete()
-            if profile:
-                profile.delete()
+
+        if not user:
             return Response(
-                data={"detail": "成功删除用户！"}, status=status.HTTP_200_OK
+                data={"detail": "用户不存在！"}, status=status.HTTP_404_NOT_FOUND
             )
-        else:
+
+        user = user[0]
+        profile = user.profile
+        if profile:
+            profile.delete()
+
+        user.delete()
+        return Response(data={"detail": "成功删除用户！"}, status=status.HTTP_200_OK)
+
+
+class OccupationViewSet(viewsets.ModelViewSet):
+    queryset = Occupation.objects.all()
+    serializer_class = OccupationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    @wrap_permission(permissions.IsAdminUser)
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @wrap_permission(permissions.IsAdminUser)
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @wrap_permission(permissions.IsAdminUser)
+    def partial_update(self, request, *args, **kwargs):
+        return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @wrap_permission(permissions.IsAdminUser)
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+
+
+class UserLogRecordViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = UserLogRecord.objects.all()
+    serializer_class = UserLogRecordSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    @wrap_permission(permissions.IsAdminUser)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+
+        log = UserLogRecord.objects.filter(id=self.kwargs.get("pk"))
+        if not log:
             return Response(
-                data={"detail": "用户不存在！"}, status=status.HTTP_400_BAD_REQUEST
+                data={"detail": "记录不存在！"}, status=status.HTTP_404_NOT_FOUND
             )
+        log = log[0]
+        if log.user != request.user:
+            return Response(
+                data={"detail": "无权限访问！"}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        ser = UserLogRecordSerializer(log)
+        return Response(data=ser.data, status=status.HTTP_200_OK)
+
+
+class BlackListViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = UserLogRecord.objects.all()
+    serializer_class = UserLogRecordSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)

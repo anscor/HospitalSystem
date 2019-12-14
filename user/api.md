@@ -25,21 +25,7 @@
 
 #### 返回参数
 
-##### 成功时 200
-
-```json
-{
-    "detail": "注册成功！"
-}
-```
-
-##### 失败时 400 
-
-```json
-{
-    "detail": "错误信息！"
-}
-```
+##### 成功时 200 400
 
 ### 用户登录
 
@@ -86,31 +72,37 @@
 }
 ```
 
-#### 示例
+### 刷新token
 
-```http
-POST /api/auth/ HTTP/1.1
-Host: 127.0.0.1:8000
-Content-Type: application/x-www-form-urlencoded
-Cache-Control: no-cache
+**POST** /api/auth/refresh/
 
-username=test1&password=password1
+#### 请求参数
+
+```json
+"refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTU3Njg5NjAwNywianRpIjoiMThmZDU3MzMxNzQ0NGM4ZGIzNTU4MTllYjE4MjUyYTEiLCJ1c2VyX2lkIjo3fQ.-xBt27NlNZ_fJYbar0es62pQZoZp9IhDcS01U3fpIYo"
 ```
+
+#### 返回参数
+
+##### 200
 
 ```json
 {
-    "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTU3Njg5NjAwNywianRpIjoiMThmZDU3MzMxNzQ0NGM4ZGIzNTU4MTllYjE4MjUyYTEiLCJ1c2VyX2lkIjo3fQ.-xBt27NlNZ_fJYbar0es62pQZoZp9IhDcS01U3fpIYo",
     "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTc2Mjk0ODA3LCJqdGkiOiJiNjhmMWIyMGEzMWY0YTIwOTUyMDhjYjNlM2NhMjM2YSIsInVzZXJfaWQiOjd9.OaJNTGpZm-pPYzfJCgk0JhBM0LTqBu4C0vBuj2EImjQ"
 }
 ```
 
+### 用户登出
+
+**GET** /api/auth/logout/
+
+#### 返回参数
+
+##### 200
+
 ### 所有用户信息
 
 **GET** /api/users/
-
-#### 请求参数
-
-无
 
 #### 返回参数
 
@@ -139,60 +131,6 @@ username=test1&password=password1
 ```
 
 ##### 失败时 403 401
-
-403
-
-```json
-{
-    "detail": "您没有执行该操作的权限。"
-}
-```
-
-#### 示例
-
-```http
-GET /api/users/ HTTP/1.1
-Host: 127.0.0.1:8000
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTc2MjkzMTQ4LCJqdGkiOiIyMGQxNzNiODA1NGE0NWU3OGRkYmY0NjBhNzAwNTg0MSIsInVzZXJfaWQiOjF9.COb9ts0SDLUCd9f46sUVKRtGLNep7EsFrvegja38Vuc
-Cache-Control: no-cache
-```
-
-```json
-[
-    {
-        "id": 1,
-        "username": "anscor",
-        "email": "",
-        "profile": null
-    },
-    {
-        "id": 2,
-        "username": "default",
-        "email": "",
-        "profile": null
-    },
-    {
-        "id": 7,
-        "username": "test1",
-        "email": "email1@test.com",
-        "profile": {
-            "age": 18,
-            "name": "name",
-            "name_pinyin": "name",
-            "gender": 0,
-            "identify_id": "100000190001010001",
-            "phone": "18888888888",
-            "address": "address1",
-            "create_time": "2019-12-14T00:08:16.967537",
-            "modify_time": "2019-12-14T00:08:16.967537",
-            "user": 7,
-            "occupation": 34,
-            "creator": 7,
-            "modifier": null
-        }
-    }
-]
-```
 
 ### 某一个用户的信息
 
@@ -229,13 +167,7 @@ Cache-Control: no-cache
 }
 ```
 
-##### 失败时 400 403
-
-```json
-{
-    "detail": "错误信息"
-}
-```
+##### 失败时 404 403
 
 ### 更新某个用户信息
 
@@ -263,51 +195,73 @@ Cache-Control: no-cache
 
 #### 返回参数
 
-##### 成功时 200
+##### 200 404 403
 
-```json
-{
-    "detail": "更改用户信息成功！"
-}
-```
+### 删除某个用户
 
-##### 失败时 400 403
+**DELETE** /api/users/{pk}/
 
-```json
-{
-    "detail": "错误信息！"
-}
-```
+#### 请求参数
+
+- pk：用户id。
+
+#### 返回参数
+
+##### 成功时 200 404 401
 
 ### 所有组别信息
 
 **GET** /api/groups/
 
-#### 请求参数
-
-无
-
 #### 返回参数
+
+##### 成功时 200
 
 ```json
 [
     {
-        "id": 1,
-        "name": "name",
-        "location": "location",
-        "contact_phone": "1xxxxxxxxxx"
-        ...
+        "id": 216,
+        "name": "group1",
+        "profile": {
+            "location": "location1",
+            "contact_phone": "18888888881",
+            "create_time": "2019-12-14T15:08:26.728911",
+            "modify_time": "2019-12-14T15:32:37.265115",
+            "group": 216,
+            "creator": 1,
+            "modifier": 1
+        }
     },
     {
-        "id": 2,
+        "id": 1,
         "name": "name",
-        "location": "location",
-        "contact_phone": "1xxxxxxxxxx"
-        ...
+        "profile": null
     },
     ...
 ]
 ```
+
+##### 失败时 401
+
+### 添加组
+
+**POST** /api/groups/
+
+#### 请求参数
+
+```json
+{
+    "name": "group1",
+    "profile": {
+        "location": "location1",
+        "contact_phone": "18888888881"
+    }
+}
+```
+
+#### 返回参数
+
+##### 200 401 403
 
 ### 某一个组的详细信息
 
@@ -315,19 +269,63 @@ Cache-Control: no-cache
 
 #### 请求参数
 
-无
+- pk：组id。
 
 #### 返回参数
 
+##### 成功时 200
+
 ```json
 {
-    "id": 1,
-    "name": "name",
-    "location": "location",
-    "contact_phone": "1xxxxxxxxxx"
-    ...
+    "id": 216,
+    "name": "group1",
+    "profile": {
+        "location": "location1",
+        "contact_phone": "18888888881",
+        "create_time": "2019-12-14T15:08:26.728911",
+        "modify_time": "2019-12-14T15:32:37.265115",
+        "group": 216,
+        "creator": 1,
+        "modifier": 1
+    }
 }
 ```
+
+##### 失败时 404 401
+
+### 修改某个组的信息
+
+**PUT** /api/groups/{pk}/
+
+#### 请求参数
+
+- pk：组id。
+
+```json
+{
+    "name": "group1",
+    "profile": {
+        "location": "location1",
+        "contact_phone": "18888888881"
+    }
+}
+```
+
+#### 返回参数
+
+##### 200 404 403 401
+
+### 删除某个组
+
+**DELETE** /api/groups/{pk}/
+
+#### 请求参数
+
+- pk：组id。
+
+#### 返回参数
+
+##### 200 404 403 401
 
 ### 某个组下的所有用户信息
 
@@ -389,11 +387,9 @@ Cache-Control: no-cache
 
 **GET** /api/occupations/
 
-#### 请求参数
-
-无
-
 #### 返回参数
+
+##### 成功时 200
 
 ```json
 [
@@ -409,6 +405,8 @@ Cache-Control: no-cache
 ]
 ```
 
+##### 失败时 401
+
 ### 创建职业
 
 **POST** /api/occupations/
@@ -423,15 +421,19 @@ Cache-Control: no-cache
 
 #### 返回参数
 
+##### 200 403 401
+
 ### 某个职业
 
 **GET** /api/occupations/{pk}/
 
 #### 请求参数
 
-无
+- pk：职业id。
 
 #### 返回参数
+
+##### 成功时 200
 
 ```json
 {
@@ -440,13 +442,45 @@ Cache-Control: no-cache
 }
 ```
 
+##### 失败时 404 401
+
+### 更改某个职业
+
+**PUT** /api/occupations/{pk}/
+
+#### 请求参数
+
+- pk：职业id。
+
+```json
+{
+    "name": "name"
+}
+```
+
+#### 返回参数
+
+##### 200 404 401 403
+
+### 删除某个职业
+
+**DELETE** /api/occupations/{pk}/
+
+#### 请求参数
+
+- pk：职业id。
+
+#### 返回参数
+
+##### 200 404 401 403
+
 ### 某个职业下的所有用户
 
 **GET** /api/occupations/{pk}/users/
 
 #### 请求参数
 
-无
+
 
 #### 返回参数
 
@@ -470,11 +504,9 @@ Cache-Control: no-cache
 
 **GET** /api/user-logs/
 
-#### 请求参数
-
-无
-
 #### 返回参数
+
+##### 成功时 200
 
 ```json
 [
@@ -498,15 +530,19 @@ Cache-Control: no-cache
 ]
 ```
 
+##### 失败时 401 403
+
 ### 某条登入或登出记录
 
 **GET** /api/user-logs/{pk}/
 
 #### 请求参数
 
-无
+- pk：记录id。
 
 #### 返回参数
+
+##### 成功时 200
 
 ```json
 {
@@ -518,6 +554,8 @@ Cache-Control: no-cache
     "operate_time": xxxxxx
 }
 ```
+
+##### 失败时 403 401 404
 
 ### 某个用户的所有登入登出记录
 
@@ -555,14 +593,13 @@ Cache-Control: no-cache
 
 **GET** /api/black-list/
 
-#### 请求参数
-
-无
-
 #### 返回参数
+
+##### 成功时 200
 
 ```json
 {
+    "id": 1,
     "patient": 1,
     "join_time": xxxxxx,
     "is_delete": 0,
@@ -570,3 +607,4 @@ Cache-Control: no-cache
 }
 ```
 
+##### 失败时 401
