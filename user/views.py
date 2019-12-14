@@ -10,9 +10,34 @@ from rest_framework.views import APIView
 from user.permissions import wrap_permission
 
 
-class logout(APIView):
+def return_param_error():
+    return Response(
+        data={"detail": "请求参数出错！"}, status=status.HTTP_400_BAD_REQUEST
+    )
+
+
+def return_not_find(msg):
+    return Response(data={"detail": msg}, status=status.HTTP_404_NOT_FOUND)
+
+
+def return_forbiden():
+    return Response(data={"detail": "无权限！"}, status=status.HTTP_403_FORBIDDEN)
+
+
+def return_success(msg):
+    return Response(data={"detail": msg}, status=status.HTTP_200_OK)
+
+
+class UserLogout(APIView):
     def get(self, request, *args, **kwargs):
-        return Response(data={"detail": "成功登出！"}, status=status.HTTP_200_OK)
+        return return_success("成功登出！")
+
+
+class UserGet(APIView):
+    @wrap_permission(permissions.IsAuthenticated)
+    def get(self, request, *args, **kwargs):
+        ser = UserSerializer(request.user)
+        return Response(data=ser.data, status=status.HTTP_200_OK)
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -30,48 +55,38 @@ class GroupViewSet(viewsets.ModelViewSet):
         profile_data = request.data.pop("profile", None)
         ser = GroupSerializer(data=request.data)
         if not ser.is_valid():
-            return Response(
-                data={"detail": "请求数据错误！"}, status=status.HTTP_400_BAD_REQUEST,
-            )
+            return return_param_error()
 
         group = ser.save()
 
         if not profile_data:
             group.delete()
-            return Response(
-                data={"detail": "请求数据错误！"}, status=status.HTTP_400_BAD_REQUEST,
-            )
+            return return_param_error()
 
         profile_data["creator"] = request.user.id
         profile_data["group"] = group.id
         ser = GroupProfileSerializer(data=profile_data)
         if not ser.is_valid():
             group.delete()
-            return Response(
-                data={"detail": "请求数据错误！"}, status=status.HTTP_400_BAD_REQUEST,
-            )
+            return return_param_error()
 
         ser.save()
 
-        return Response(data={"detail": "创建成功！"}, status=status.HTTP_200_OK)
+        return return_success("创建成功！")
 
     @wrap_permission(permissions.IsAdminUser)
     def update(self, request, *args, **kwargs):
         profile_data = request.data.pop("profile", None)
         group = Group.objects.filter(id=self.kwargs.get("pk"))
         if not group:
-            return Response(
-                data={"detail": "用户组不存在！"}, status=status.HTTP_404_NOT_FOUND,
-            )
+            return return_not_find("用户组不存在！")
 
         group = group[0]
         group_ser = GroupSerializer(
             instance=group, data=request.data, partial=True
         )
         if not group_ser.is_valid():
-            return Response(
-                data={"detail": "请求数据错误！"}, status=status.HTTP_400_BAD_REQUEST,
-            )
+            return return_param_error()
 
         profile = group.profile
 
@@ -82,10 +97,7 @@ class GroupViewSet(viewsets.ModelViewSet):
                 instance=profile, data=profile_data, partial=True
             )
             if not profile_ser.is_valid():
-                return Response(
-                    data={"detail": "请求数据错误！"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                return return_param_error()
             profile_ser.save()
         # 创建profile
         elif not profile and profile_data:
@@ -93,26 +105,19 @@ class GroupViewSet(viewsets.ModelViewSet):
             profile_data["creator"] = request.user.id
             profile_ser = GroupProfileSerializer(data=profile_data)
             if not profile_ser.is_valid():
-                return Response(
-                    data={"detail": "请求数据错误！"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                return return_param_error()
             profile_ser.save()
         # 删除profile
         elif not profile_data and profile:
             profile.delete()
 
         group_ser.save()
-        return Response(
-            data={"detail": "更改用户组信息成功！"}, status=status.HTTP_200_OK
-        )
+        return return_success()
 
     def retrieve(self, request, *args, **kwargs):
         group = Group.objects.filter(id=self.kwargs.get("pk"))
         if not group:
-            return Response(
-                data={"detail": "用户组不存在！"}, status=status.HTTP_404_NOT_FOUND,
-            )
+            return return_not_find("用户组不存在！")
         group = group[0]
         ser = GroupSerializer(group)
         return Response(ser.data, status=status.HTTP_200_OK)
@@ -124,21 +129,63 @@ class GroupViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         group = Group.objects.filter(id=self.kwargs.get("pk"))
         if not group:
-            return Response(
-                data={"detail": "用户组不存在！"}, status=status.HTTP_404_NOT_FOUND,
-            )
+            return return_not_find("用户组不存在！")
         group = group[0]
         profile = group.profile
         if profile:
             profile.delete()
 
         group.delete()
-        return Response(data={"detail": "成功删除用户组！"}, status=status.HTTP_200_OK)
+        return return_success("成功删除用户组！")
 
-    # @wrap_permission(permissions.IsAdminUser)
-    # @action(methods=["GET"], detail=True, url_path="users", url_name="users")
-    # def group_users(self, request, pk=None):
+    def get_group_users(self, request, pk=None):
+        if not pk:
+            return return_param_error()
 
+        group = Group.objects.filter(id=pk)
+        if not group:
+            return return_not_find("用户组不存在！")
+        group = group[0]
+
+        ser = UserSerializer(group.user_set.all(), many=True)
+        return Response(data=ser.data, status=status.HTTP_200_OK)
+
+    def add_group_users(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+
+        group = Group.objects.filter(id=pk)
+        if not group:
+            return return_not_find("用户组不存在！")
+        group = group[0]
+
+        user_id = request.data.get("user", None)
+        if not user_id:
+            return return_param_error()
+
+        user = User.objects.filter(id=user_id)
+        if not user:
+            return return_not_find("用户不存在！")
+
+        user = user[0]
+        if user in group.user_set.all():
+            return return_param_error("用户已在所添加的组内！")
+
+        group.user_set.add(user)
+        return return_success("添加成功！")
+
+    @wrap_permission(permissions.IsAdminUser)
+    @action(
+        methods=["POST", "GET"],
+        detail=True,
+        url_name="users",
+        url_path="users",
+    )
+    def group_users(self, request, pk=None):
+        if request.method == "POST":
+            return self.add_group_users(request, pk)
+        else:
+            return self.get_group_users(request, pk)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -148,23 +195,12 @@ class UserViewSet(viewsets.ModelViewSet):
     def _checkIsOwnerOrAdminUser(self, user_set, request):
         # 用户不存在
         if not user_set:
-            return (
-                Response(
-                    data={"detail": "用户不存在！"},
-                    status=status.HTTP_404_NOT_FOUND,
-                ),
-                None,
-            )
+            return return_not_find("用户不存在！"), None
 
         # 不是本人也不是管理员
         user = user_set[0]
         if user != request.user and not request.user.is_staff:
-            return (
-                Response(
-                    data={"detail": "无权限访问！"}, status=status.HTTP_403_FORBIDDEN
-                ),
-                None,
-            )
+            return return_forbiden(), None
 
         return user, True
 
@@ -172,36 +208,30 @@ class UserViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         data = request.data.pop("profile", None)
         group_id = request.data.pop("group", None)
-        
+
         # 用户名重复
         user = User.objects.all().filter(username=request.data.get("username"))
         if user:
-            return Response(
-                data={"detail": "用户已存在！"}, status=status.HTTP_400_BAD_REQUEST
-            )
-        
+            return return_param_error("用户已存在！")
+
         # 用户组别，不传时默认为病人
         group = Group.objects.all().filter(name="病人")
         if group_id:
             group = Group.objects.all().filter(id=group_id)
             if not group:
-                return Response(data={"detail": "用户组不存在！"}, status=status.HTTP_400_BAD_REQUEST)
-        
+                return return_not_find("用户组不存在！")
+
         group = group[0]
 
         user_ser = UserSerializer(data=request.data)
         if not user_ser.is_valid():
-            return Response(
-                data={"detail": "参数错误！"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return return_param_error()
 
         user = user_ser.save()
 
         # 如果没有传profile则直接返回
         if not data:
-            return Response(
-                data={"detail": "注册成功！"}, status=status.HTTP_200_OK
-            )
+            return return_success("注册成功！")
         # 创建对应profile
         data["user"] = user.id
         data["creator"] = (
@@ -214,15 +244,11 @@ class UserViewSet(viewsets.ModelViewSet):
         if ser.is_valid():
             ser.save()
             group.user_set.add(user)
-            return Response(
-                data={"detail": "注册成功！"}, status=status.HTTP_200_OK
-            )
+            return return_success("注册成功！")
         else:
             # 如果profile创建失败，将原来已经添加的用户删除
             user.delete()
-            return Response(
-                data={"detail": "参数错误！"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return return_param_error()
 
     def retrieve(self, request, *args, **kwargs):
         user = User.objects.all().filter(id=self.kwargs.get("pk", ""))
@@ -257,9 +283,7 @@ class UserViewSet(viewsets.ModelViewSet):
         )
 
         if not user_ser.is_valid():
-            return Response(
-                data={"detail": "请求数据错误！"}, status=status.HTTP_400_BAD_REQUEST,
-            )
+            return return_param_error()
 
         # 更新profile
         if profile_data and profile:
@@ -269,18 +293,12 @@ class UserViewSet(viewsets.ModelViewSet):
             )
             # 请求数据出错
             if not ser.is_valid():
-                return Response(
-                    data={"detail": "请求数据错误！"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                return return_param_error()
             ser.save()
         # 删除profile
         elif not profile_data and profile:
             if not user_ser.is_valid():
-                return Response(
-                    data={"detail": "请求数据错误！"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                return return_param_error()
             profile.delete()
         # 创建profile
         elif not profile and profile_data:
@@ -289,16 +307,11 @@ class UserViewSet(viewsets.ModelViewSet):
             ser = UserProfileSerializer(data=profile_data)
             # 请求数据出错
             if not ser.is_valid():
-                return Response(
-                    data={"detail": "请求数据错误！"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                return return_param_error()
             ser.save()
         user_ser.save()
 
-        return Response(
-            data={"detail": "更改用户信息成功！"}, status=status.HTTP_200_OK
-        )
+        return return_success("更改用户信息成功！")
 
     def partial_update(self, request, *args, **kwargs):
         return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -308,9 +321,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user = User.objects.all().filter(id=self.kwargs.get("pk", ""))
 
         if not user:
-            return Response(
-                data={"detail": "用户不存在！"}, status=status.HTTP_404_NOT_FOUND
-            )
+            return return_not_find("用户不存在！")
 
         user = user[0]
         profile = user.profile
@@ -318,7 +329,59 @@ class UserViewSet(viewsets.ModelViewSet):
             profile.delete()
 
         user.delete()
-        return Response(data={"detail": "成功删除用户！"}, status=status.HTTP_200_OK)
+        return return_success("成功删除用户！")
+
+    def get_user_groups(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+        user = User.objects.all().filter(id=pk)
+        if not user:
+            return return_not_find("用户不存在！")
+
+        ret, success = self._checkIsOwnerOrAdminUser(user, request)
+        if not success:
+            return ret
+        user = ret
+        groups = user.groups.all()
+        ser = GroupSerializer(groups, many=True)
+        return Response(data=ser.data, status=status.HTTP_200_OK)
+
+    def add_user_groups(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+
+        if not request.user or not request.user.is_staff:
+            return return_forbiden()
+
+        user = User.objects.all().filter(id=pk)
+        if not user:
+            return return_not_find("用户不存在！")
+
+        group_id = request.data.get("group", None)
+        if not group_id:
+            return return_param_error()
+
+        group = Group.objects.all().filter(id=group_id)
+        if not group:
+            return return_not_find("用户组不存在！")
+
+        group = group[0]
+        user = user[0]
+        user.groups.add(group)
+        return return_success("添加成功！")
+
+    @wrap_permission(permissions.IsAuthenticated)
+    @action(
+        methods=["GET", "POST"],
+        detail=True,
+        url_path="groups",
+        url_name="groups",
+    )
+    def user_groups(self, request, pk=None):
+        if request.method == "POST":
+            return self.add_user_groups(request, pk)
+        else:
+            return self.get_user_groups(request, pk)
 
 
 class OccupationViewSet(viewsets.ModelViewSet):
@@ -341,6 +404,21 @@ class OccupationViewSet(viewsets.ModelViewSet):
     @wrap_permission(permissions.IsAdminUser)
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
+
+    @wrap_permission(permissions.IsAdminUser)
+    @action(methods=["GET"], detail=True, url_path="users", url_name="users")
+    def get_users(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+
+        occ = Occupation.objects.all().filter(id=pk)
+        if not occ:
+            return return_not_find("职业不存在！")
+
+        occ = occ[0]
+        users = User.objects.all().filter(profile__occupation=occ)
+        ser = UserSerializer(users, many=True)
+        return Response(data=ser.data, status=status.HTTP_200_OK)
 
 
 class BlackListViewSet(viewsets.ReadOnlyModelViewSet):

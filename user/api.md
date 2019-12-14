@@ -72,6 +72,38 @@
 }
 ```
 
+### 通过token获取用户信息
+
+**GET** /api/auth/user/
+
+#### 返回参数
+
+##### 成功时 200
+
+```json
+{
+    "id": 7,
+    "username": "test1",
+    "email": "email1@test.com",
+    "profile": {
+        "name": "name",
+        "name_pinyin": "name",
+        "gender": 0,
+        "identify_id": "100000190001010001",
+        "phone": "18888888888",
+        "address": "address1",
+        "create_time": "2019-12-14T00:08:16.967537",
+        "modify_time": "2019-12-14T00:08:16.967537",
+        "user": 7,
+        "occupation": 34,
+        "creator": 7,
+        "modifier": null
+    }
+}
+```
+
+##### 失败时 401
+
 ### 刷新token
 
 **POST** /api/auth/refresh/
@@ -330,9 +362,11 @@
 
 #### 请求参数
 
-无
+- pk：用户组id。
 
 #### 返回参数
+
+##### 成功时 200
 
 ```json
 [
@@ -349,6 +383,8 @@
     ...
 ]
 ```
+
+##### 失败时 400 404 403 401
 
 ### 某个用户所属的所有组
 
@@ -356,9 +392,11 @@
 
 #### 请求参数
 
-无
+- pk：用户id。
 
 #### 返回参数
+
+##### 成功时 200
 
 ```json
 [
@@ -379,6 +417,48 @@
     ...
 ]
 ```
+
+##### 失败时 400 404 403 401
+
+### 为某个组添加用户
+
+**POST** /api/groups/{pk}/users/
+
+#### 请求参数
+
+- pk：用户组id。
+
+```json
+{
+    "user": 1
+}
+```
+
+#### 返回参数
+
+##### 成功时 200
+
+##### 失败时 400 401 403 404
+
+### 为某个用户添加所属组
+
+**POST** /api/users/{pk}/groups/
+
+#### 请求参数
+
+- pk：用户id。
+
+```json
+{
+    "group": 1
+}
+```
+
+#### 返回参数
+
+##### 成功时 200
+
+##### 失败时 400 401 403 404
 
 ### 所有职业
 
@@ -477,9 +557,11 @@
 
 #### 请求参数
 
-
+- pk：职业id。
 
 #### 返回参数
+
+##### 成功时 200
 
 ```json
 [
@@ -497,94 +579,7 @@
 ]
 ```
 
-### 所有登入登出记录
-
-**GET** /api/user-logs/
-
-#### 返回参数
-
-##### 成功时 200
-
-```json
-[
-    {
-        "id": 1,
-        "user": 1,
-        "ip": "xxxxxxx",
-        "operation": 0,		// 0表示登入，1表示登出
-        "operator": 1,
-        "operate_time": xxxxxx
-    },
-    {
-        "id": 2,
-        "user": 1,
-        "ip": "xxxxxxx",
-        "operation": 0,		// 0表示登入，1表示登出
-        "operator": 1,
-        "operate_time": xxxxxx
-    },
-    ...
-]
-```
-
-##### 失败时 401 403
-
-### 某条登入或登出记录
-
-**GET** /api/user-logs/{pk}/
-
-#### 请求参数
-
-- pk：记录id。
-
-#### 返回参数
-
-##### 成功时 200
-
-```json
-{
-    "id": 1,
-    "user": 1,
-    "ip": "xxxxxxx",
-    "operation": 0,		// 0表示登入，1表示登出
-    "operator": 1,
-    "operate_time": xxxxxx
-}
-```
-
-##### 失败时 403 401 404
-
-### 某个用户的所有登入登出记录
-
-**GET** /api/users/{pk}/user-logs/
-
-#### 请求参数
-
-无
-
-#### 返回参数
-
-```json
-[
-    {
-        "id": 1,
-        "user": 1,
-        "ip": "xxxxxxx",
-        "operation": 0,		// 0表示登入，1表示登出
-        "operator": 1,
-        "operate_time": xxxxxx
-    },
-    {
-        "id": 2,
-        "user": 1,
-        "ip": "xxxxxxx",
-        "operation": 0,		// 0表示登入，1表示登出
-        "operator": 1,
-        "operate_time": xxxxxx
-    },
-    ...
-]
-```
+##### 失败时 400 401 403 404
 
 ### 所有病人黑名单
 
@@ -595,13 +590,16 @@
 ##### 成功时 200
 
 ```json
-{
-    "id": 1,
-    "patient": 1,
-    "join_time": xxxxxx,
-    "is_delete": 0,
-    "reason": "xxx"
-}
+[
+    {
+        "id": 1,
+        "patient": 1,
+        "join_time": xxxxxx,
+        "is_delete": 0,
+        "reason": "xxx"
+    },
+    ...
+]
 ```
 
 ##### 失败时 401

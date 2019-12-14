@@ -51,35 +51,33 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 
 ## 用户模块
 
-| 请求方法 | 地址                         | 说明                                     |
-| :------- | :--------------------------- | :--------------------------------------- |
-| POST     | /api/auth/                   | 用户登录（完成）                         |
-| POST     | /api/auth/refresh/           | 刷新token（完成）                        |
-| GET      | /api/auth/logout/            | 用户登出（完成）                         |
-| POST     | /api/users/                  | 用户注册（完成）                         |
-| GET      | /api/users/                  | 所有用户信息（管理员可用）（完成）       |
-| GET      | /api/users/{pk}/             | 某个用户信息（本人可用）（完成）         |
-| DELETE   | /api/users/{pk}/             | 删除某个用户（管理员可用）（完成）       |
-| PUT      | /api/users/{pk}/             | 更新某个用户信息（本人可用）（完成）     |
-| GET      | /api/groups/                 | 所有组信息（完成）                       |
-| POST     | /api/groups/                 | 添加组（管理员可用）（完成）             |
-| GET      | /api/groups/{pk}/            | 某个组信息（完成）                       |
-| PUT      | /api/groups/{pk}/            | 修改某个组信息（管理员可用）（完成）     |
-| DELETE   | /api/groups/{pk}/            | 删除某个组（管理员可用）（完成）         |
-| GET      | /api/groups/{pk}/users/      | 某个组下的所有用户信息（管理员可用）     |
-| GET      | /api/users/{pk}/groups/      | 某个用户所属的所有组                     |
-| POST     | /api/groups/{pk}/users/      | 为某个组添加用户（管理员可用）           |
-| POST     | /api/users/{pk}/groups/      | 为某个用户添加所属组（管理员可用）       |
-| GET      | /api/occupations/            | 所有职业信息（完成）                     |
-| POST     | /api/occupations/            | 创建职业信息（完成）                     |
-| GET      | /api/occupations/{pk}/       | 某个职业的信息（完成）                   |
-| PUT      | /api/occupations/{pk}/       | 更改某个职业的信息（管理员可用）（完成） |
-| DELETE   | /api/occupations/{pk}/       | 删除某个职业（管理员可用）（完成）       |
-| GET      | /api/occupations/{pk}/users/ | 某个职业下的所有用户                     |
-| GET      | /api/user-logs/              | 所有登入登出记录（管理员可用）（完成）   |
-| GET      | /api/user-logs/{pk}/         | 某条登入登出记录（本人可用）（完成）     |
-| GET      | /api/users/{pk}/user-logs/   | 某个用户的所有登入登出记录               |
-| GET      | /api/black-list/             | 病人黑名单（完成）                       |
+| 请求方法 | 地址                         | 说明                                         |
+| :------- | :--------------------------- | :------------------------------------------- |
+| POST     | /api/auth/                   | 用户登录（完成）                             |
+| GET      | /api/auth/user/              | 通过token获取用户信息（完成）                |
+| POST     | /api/auth/refresh/           | 刷新token（完成）                            |
+| GET      | /api/auth/logout/            | 用户登出（完成）                             |
+| POST     | /api/users/                  | 用户注册（完成）                             |
+| GET      | /api/users/                  | 所有用户信息（管理员可用）（完成）           |
+| GET      | /api/users/{pk}/             | 某个用户信息（本人可用）（完成）             |
+| DELETE   | /api/users/{pk}/             | 删除某个用户（管理员可用）（完成）           |
+| PUT      | /api/users/{pk}/             | 更新某个用户信息（本人可用）（完成）         |
+| GET      | /api/groups/                 | 所有组信息（完成）                           |
+| POST     | /api/groups/                 | 添加组（管理员可用）（完成）                 |
+| GET      | /api/groups/{pk}/            | 某个组信息（完成）                           |
+| PUT      | /api/groups/{pk}/            | 修改某个组信息（管理员可用）（完成）         |
+| DELETE   | /api/groups/{pk}/            | 删除某个组（管理员可用）（完成）             |
+| GET      | /api/groups/{pk}/users/      | 某个组下的所有用户信息（管理员可用）（完成） |
+| GET      | /api/users/{pk}/groups/      | 某个用户所属的所有组（完成）                 |
+| POST     | /api/groups/{pk}/users/      | 为某个组添加用户（管理员可用）（完成）       |
+| POST     | /api/users/{pk}/groups/      | 为某个用户添加所属组（管理员可用）（完成）   |
+| GET      | /api/occupations/            | 所有职业信息（完成）                         |
+| POST     | /api/occupations/            | 创建职业信息（完成）                         |
+| GET      | /api/occupations/{pk}/       | 某个职业的信息（完成）                       |
+| PUT      | /api/occupations/{pk}/       | 更改某个职业的信息（管理员可用）（完成）     |
+| DELETE   | /api/occupations/{pk}/       | 删除某个职业（管理员可用）（完成）           |
+| GET      | /api/occupations/{pk}/users/ | 某个职业下的所有用户（管理员可用）（完成）   |
+| GET      | /api/black-list/             | 病人黑名单（完成）                           |
 
 ## 门诊模块
 
