@@ -11,10 +11,10 @@
     "username": "test1",
     "password": "password1",
     "email": "email1@test.com",
-    "group": 123,  // 可以不传，不传时设置为病人
+    "group": 123,  // 关联组id。可以不传，不传时设置为病人
     "profile": {
         "gender": 0,
-        "occupation": 34,
+        "occupation": 34,	// 关联职业id
         "name": "name",
         "identify_id": "100000190001010001",
         "phone": "18888888888",
@@ -94,10 +94,10 @@
         "address": "address1",
         "create_time": "2019-12-14T00:08:16.967537",
         "modify_time": "2019-12-14T00:08:16.967537",
-        "user": 7,
-        "occupation": 34,
-        "creator": 7,
-        "modifier": null
+        "user": 7,	// profile对应用户id，一般没用
+        "occupation": 34,	// 关联职业id
+        "creator": 7,	// 关联用户id
+        "modifier": null	// 关联用户id
     }
 }
 ```
@@ -151,12 +151,22 @@
         "profile": null
     },
     {
-        "id": 2,
-        "username": "username",
-        "email": "",
+        "id": 7,
+        "username": "test1",
+        "email": "email1@test.com",
         "profile": {
             "name": "name",
-            ...
+            "name_pinyin": "name",
+            "gender": 0,
+            "identify_id": "100000190001010001",
+            "phone": "18888888888",
+            "address": "address1",
+            "create_time": "2019-12-14T00:08:16.967537",
+            "modify_time": "2019-12-14T00:08:16.967537",
+            "user": 7,	// profile对应用户id，一般没用
+            "occupation": 34,	// 关联职业id
+            "creator": 7,	// 关联用户id
+            "modifier": null	// 关联用户id
         }
     },
     ...
@@ -191,10 +201,10 @@
         "address": "address1",
         "create_time": "2019-12-14T00:08:16.967537",
         "modify_time": "2019-12-14T00:08:16.967537",
-        "user": 7,
-        "occupation": 34,
-        "creator": 7,
-        "modifier": null
+        "user": 7,	// profile对应用户id，一般没用
+        "occupation": 34,	// 关联职业id
+        "creator": 7,	// 关联用户id
+        "modifier": null	// 关联用户id
     }
 }
 ```
@@ -215,7 +225,7 @@
     "email": "email1@test.com",
     "profile": {
         "gender": 0,
-        "occupation": 34,
+        "occupation": 34,	// 关联职业id
         "name": "name",
         "identify_id": "100000190001010001",
         "phone": "18888888888",
@@ -260,10 +270,10 @@
             "contact_phone": "18812341234",
             "create_time": "2019-12-14T17:16:02.911170",
             "modify_time": "2019-12-14T17:16:02.911170",
-            "group": 221,
-            "parent_group": 238,
-            "creator": 1,
-            "modifier": null
+            "group": 221,	// profile对应组的id，一般没用
+            "parent_group": 238,	// 关联组id
+            "creator": 1,	// 关联用户id
+            "modifier": null	// 关联用户id
         }
     },
     {
@@ -295,10 +305,10 @@
             "contact_phone": "18812341234",
             "create_time": "2019-12-14T17:16:02.911170",
             "modify_time": "2019-12-14T17:16:02.911170",
-            "group": 221,
-            "parent_group": 238,
-            "creator": 1,
-            "modifier": null
+            "group": 221,	// profile对应组的id，一般没用
+            "parent_group": 238,	// 关联组id
+            "creator": 1,	// 关联用户id
+            "modifier": null	// 关联用户id
         }
     },
     {
@@ -322,7 +332,7 @@
     "profile": {
         "location": "location1",
         "contact_phone": "18888888881",
-        "parent_group": 238	// 可选
+        "parent_group": 238	// 关联组id。可选
     }
 }
 ```
@@ -355,10 +365,10 @@
         "contact_phone": "18812341234",
         "create_time": "2019-12-14T17:16:02.911170",
         "modify_time": "2019-12-14T17:16:02.911170",
-        "group": 221,
-        "parent_group": 238,
-        "creator": 1,
-        "modifier": null
+        "group": 221,	// profile对应组的id，一般没用
+        "parent_group": 238,	// 关联组id
+        "creator": 1,	// 关联用户id
+        "modifier": null	// 关联用户id
     }
 }
 ```
@@ -379,7 +389,7 @@
     "profile": {
         "location": "location1",
         "contact_phone": "18888888881",
-        "parent_group": 238
+        "parent_group": 238	// 关联组id
     }
 }
 ```
@@ -419,12 +429,27 @@
     {
         "id": 1,
         "username": "username",
-        ...
+        "email": "",
+        "profile": null
     },
     {
-        "id": 2,
-        "username": "username",
-        ...
+        "id": 7,
+        "username": "test1",
+        "email": "email1@test.com",
+        "profile": {
+            "name": "name",
+            "name_pinyin": "name",
+            "gender": 0,
+            "identify_id": "100000190001010001",
+            "phone": "18888888888",
+            "address": "address1",
+            "create_time": "2019-12-14T00:08:16.967537",
+            "modify_time": "2019-12-14T00:08:16.967537",
+            "user": 7,	// profile对应用户id，一般没用
+            "occupation": 34,	// 关联职业id
+            "creator": 7,	// 关联用户id
+            "modifier": null	// 关联用户id
+        }
     },
     ...
 ]
@@ -447,18 +472,23 @@
 ```json
 [
     {
-        "id": 1,
-        "name": "name",
-        "location": "location",
-        "contact_phone": "1xxxxxxxxxx"
-        ...
+        "id": 221,
+        "name": "化验科",
+        "profile": {
+            "location": "化验科地址",
+            "contact_phone": "18812341234",
+            "create_time": "2019-12-14T17:16:02.911170",
+            "modify_time": "2019-12-14T17:16:02.911170",
+            "group": 221,	// profile对应组的id，一般没用
+            "parent_group": 238,	// 关联组id
+            "creator": 1,	// 关联用户id
+            "modifier": null	// 关联用户id
+        }
     },
     {
-        "id": 2,
-        "name": "name",
-        "location": "location",
-        "contact_phone": "1xxxxxxxxxx"
-        ...
+        "id": 218,
+        "name": "医生",
+        "profile": null
     },
     ...
 ]
@@ -476,7 +506,7 @@
 
 ```json
 {
-    "user": 1
+    "user": 1	// 关联用户id
 }
 ```
 
@@ -496,7 +526,7 @@
 
 ```json
 {
-    "group": 1
+    "group": 1	// 关联组id
 }
 ```
 
@@ -616,12 +646,27 @@
     {
         "id": 1,
         "username": "username",
-        ...
+        "email": "",
+        "profile": null
     },
     {
-        "id": 2,
-        "username": "username",
-        ...
+        "id": 7,
+        "username": "test1",
+        "email": "email1@test.com",
+        "profile": {
+            "name": "name",
+            "name_pinyin": "name",
+            "gender": 0,
+            "identify_id": "100000190001010001",
+            "phone": "18888888888",
+            "address": "address1",
+            "create_time": "2019-12-14T00:08:16.967537",
+            "modify_time": "2019-12-14T00:08:16.967537",
+            "user": 7,	// profile对应用户id，一般没用
+            "occupation": 34,	// 关联职业id
+            "creator": 7,	// 关联用户id
+            "modifier": null	// 关联用户id
+        }
     },
     ...
 ]
