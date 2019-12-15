@@ -21,8 +21,9 @@ from .serializers import *
 class ReservationTimeViewSet(viewsets.ModelViewSet):
     queryset = ReservationTime.objects.all()
     serializer_class = ReservationTimeSerializer
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+    # permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
+    @wrap_permission(permissions.IsAdminUser)
     def create(self, request, *args, **kwargs):
         data = request.data
         start = data.get("start", None)
@@ -42,6 +43,7 @@ class ReservationTimeViewSet(viewsets.ModelViewSet):
         ser.save()
         return return_success("预约时间段添加成功！")
 
+    @wrap_permission(permissions.IsAdminUser)
     def update(self, request, *args, **kwargs):
         data = request.data
         # 转换时间
@@ -69,16 +71,34 @@ class ReservationTimeViewSet(viewsets.ModelViewSet):
         ser.save()
         return return_success("更新成功！")
 
+    @wrap_permission(permissions.IsAdminUser)
     def partial_update(self, request, *args, **kwargs):
         return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @wrap_permission(permissions.AllowAny)
     def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
+        time = ReservationTime.objects.all().filter(id=self.kwargs.get("pk", 0))
+        if not time:
+            return return_not_find("预约时间段不存在！")
+        time = time[0]
+
+        data = ReservationTimeSerializer(time).data
+        reserved_num = Reservation.objects.all().filter(time_id=time.id).count()
+        data["reserved_num"] = reserved_num
+        return Response(data=data, status=status.HTTP_200_OK)
 
     @wrap_permission(permissions.AllowAny)
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        times = ReservationTime.objects.all()
+        ser = ReservationTimeSerializer(times, many=True)
+        ress = Reservation.objects.all()
+        data = []
+        for d in ser.data:
+            reserved_num = ress.filter(time_id=d.get("id")).count()
+            d["reserved_num"] = reserved_num
+            data.append(d)
+
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
 class ReservationViewSet(viewsets.ModelViewSet):

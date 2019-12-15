@@ -8,7 +8,8 @@ from django.contrib.auth.models import AnonymousUser
 from rest_framework.views import APIView
 
 from user.permissions import wrap_permission
-from reservation.serializers import VisitSerializer
+from reservation.serializers import VisitSerializer, ReservationSerializer
+from reservation.models import Reservation
 
 
 def return_param_error(msg="请求参数出错！"):
@@ -70,6 +71,16 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        name = request.query_params.get("name", None)
+        groups = Group.objects.all()
+        if name:
+            groups = groups.filter(name=name)
+        if not groups:
+            return return_not_find("没有相应的组！")
+        ser = GroupSerializer(groups)
+        return Response(data=ser.data, status=status.HTTP_200_OK)
 
     @wrap_permission(permissions.IsAdminUser)
     def create(self, request, *args, **kwargs):
@@ -253,7 +264,9 @@ class UserViewSet(viewsets.ModelViewSet):
         # 创建成功
         if ser.is_valid():
             ser.save()
-            group.user_set.add(user)
+            gs = get_all_groups(group)
+            for g in gs:
+                user.groups.add(g)
             return return_success("注册成功！")
         else:
             # 如果profile创建失败，将原来已经添加的用户删除
@@ -417,8 +430,11 @@ class UserViewSet(viewsets.ModelViewSet):
             return return_not_find("用户不存在！")
         user = user[0]
 
-        # TODO: 
-        return return_success()
+        ress = Reservation.objects.all()
+        pg = Group.objects.get(name="病人")
+
+        ser = ReservationSerializer(ress, many=True)
+        return Response(data=ser.data, status=status.HTTP_200_OK)
 
 
 class OccupationViewSet(viewsets.ModelViewSet):

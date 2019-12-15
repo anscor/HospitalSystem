@@ -14,7 +14,8 @@
         "id": 1,
         "start": "08:30:00",
         "end": "09:00:00",
-        "patient_num": 30
+        "patient_num": 30,
+        "reserved_num": 1
     },
     ...
 ]
@@ -57,7 +58,8 @@
     "id": 1,
     "start": "08:30:00",
     "end": "09:00:00",
-    "patient_num": 30
+    "patient_num": 30,
+    "reserved_num": 1
 }
 ```
 

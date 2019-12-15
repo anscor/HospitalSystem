@@ -302,9 +302,12 @@
 
 **GET** /api/groups/{pk}/
 
+**GET** /api/groups/?name=
+
 #### 请求参数
 
 - pk：组id。
+- name：组名。
 
 #### 返回参数
 
