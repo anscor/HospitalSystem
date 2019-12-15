@@ -78,6 +78,15 @@ class GroupProfile(models.Model):
         verbose_name="组id",
     )
 
+    parent_group = models.ForeignKey(
+        Group,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="children_groups",
+        verbose_name="父组id",
+    )
+
     location = models.CharField(
         max_length=255, null=True, blank=True, verbose_name="位置"
     )

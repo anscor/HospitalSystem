@@ -44,11 +44,6 @@ class GroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def list(self, request, *args, **kwargs):
-        groups = Group.objects.all()
-        ser = GroupSerializer(groups, many=True)
-        return Response(data=ser.data, status=status.HTTP_200_OK)
-
     @wrap_permission(permissions.IsAdminUser)
     def create(self, request, *args, **kwargs):
         profile_data = request.data.pop("profile", None)
@@ -58,9 +53,9 @@ class GroupViewSet(viewsets.ModelViewSet):
 
         group = ser.save()
 
+        # 没有profile直接返回
         if not profile_data:
-            group.delete()
-            return return_param_error()
+            return return_success("创建组成功！")
 
         profile_data["creator"] = request.user.id
         profile_data["group"] = group.id
@@ -71,7 +66,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 
         ser.save()
 
-        return return_success("创建成功！")
+        return return_success("创建组成功！")
 
     @wrap_permission(permissions.IsAdminUser)
     def update(self, request, *args, **kwargs):
@@ -106,27 +101,16 @@ class GroupViewSet(viewsets.ModelViewSet):
             if not profile_ser.is_valid():
                 return return_param_error()
             profile_ser.save()
-        # 删除profile
-        elif not profile_data and profile:
-            profile.delete()
 
         group_ser.save()
         return return_success()
-
-    def retrieve(self, request, *args, **kwargs):
-        group = Group.objects.filter(id=self.kwargs.get("pk"))
-        if not group:
-            return return_not_find("用户组不存在！")
-        group = group[0]
-        ser = GroupSerializer(group)
-        return Response(ser.data, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
         return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @wrap_permission(permissions.IsAdminUser)
     def destroy(self, request, *args, **kwargs):
-        group = Group.objects.filter(id=self.kwargs.get("pk"))
+        group = Group.objects.filter(id=self.kwargs.get("pk", 0))
         if not group:
             return return_not_find("用户组不存在！")
         group = group[0]
@@ -294,11 +278,6 @@ class UserViewSet(viewsets.ModelViewSet):
             if not ser.is_valid():
                 return return_param_error()
             ser.save()
-        # 删除profile
-        elif not profile_data and profile:
-            if not user_ser.is_valid():
-                return return_param_error()
-            profile.delete()
         # 创建profile
         elif not profile and profile_data:
             profile_data["user"] = ret.id
