@@ -100,30 +100,32 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 
 ## 财务模块
 
-| 请求方法 | 地址                             | 说明                             |
-| -------- | -------------------------------- | -------------------------------- |
-| GET      | /api/pay-records/                | 所有缴费记录（根据用户进行筛选） |
-| POST     | /api/pay-records/                | 创建缴费记录                     |
-| GET      | /api/pay-records/{id}/           | 某条缴费记录                     |
-| GET      | /api/pay-types/                  | 所有缴费类型                     |
-| POST     | /api/pay-types/                  | 添加缴费类型                     |
-| GET      | /api/pay-types/{id}/             | 某种缴费类型                     |
-| GET      | /api/pay-types/{id}/pay-records/ | 某种缴费类型下的所有缴费记录     |
-| GET      | /api/users/{id}/pay-records/     | 某个用户下的所有缴费记录         |
-| GET      | /api/pay-records/{id}/items/     | 某条缴费记录下的所有项目         |
-| POST     | /api/pay-records/{id}/items/     | 为某条缴费记录的添加项目         |
-| GET      | /api/refund-records/             | 所有退款记录（根据用户进行筛选） |
-| POST     | /api/refund-records/             | 创建退款记录                     |
-| GET      | /api/refund-records/{id}/        | 某条退款记录                     |
-| GET      | /api/users/{id}/refund-records/  | 某个用户下的所有退款记录         |
-| GET      | /api/audit-records/              | 所有结算记录（根据用户进行筛选） |
-| POST     | /api/audit-records/              | 创建结算记录                     |
-| GET      | /api/audit-records/{id}/         | 某条结算记录                     |
-| PUT      | /api/audit-records/{id}/         | 更新某条结算记录                 |
-| PATCH    | /api/audit-records/{id}/         | 更新某条结算记录                 |
-| GET      | /api/users/{id}/audit-records/   | 某个用户下的所有结算记录         |
-| GET      | /api/audit-records/{id}/items/   | 某条结算记录下的所有项目         |
-| POST     | /api/audit-records/{id}/items/   | 为某条结算记录的添加项目         |
+| 请求方法 | 地址                             | 说明                                   |
+| -------- | -------------------------------- | -------------------------------------- |
+| GET      | /api/pay-records/                | 所有缴费记录                           |
+| POST     | /api/pay-records/                | 创建缴费记录                           |
+| GET      | /api/pay-records/{pk}/           | 某条缴费记录                           |
+| GET      | /api/pay-types/                  | 所有缴费类型（完成）                   |
+| POST     | /api/pay-types/                  | 添加缴费类型（完成）                   |
+| GET      | /api/pay-types/{pk}/             | 某种缴费类型（完成）                   |
+| PUT      | /api/pay-types/{pk}/             | 修改某种缴费类型                       |
+| DELETE   | /api/pay-types/{pk}/             | 删除某种缴费类型（管理员可用）（完成） |
+| GET      | /api/pay-types/{pk}/pay-records/ | 某种缴费类型下的所有缴费记录           |
+| GET      | /api/users/{pk}/pay-records/     | 某个用户下的所有缴费记录               |
+| GET      | /api/pay-records/{pk}/items/     | 某条缴费记录下的所有项目               |
+| POST     | /api/pay-records/{pk}/items/     | 为某条缴费记录的添加项目               |
+| GET      | /api/refund-records/             | 所有退款记录                           |
+| POST     | /api/refund-records/             | 创建退款记录                           |
+| GET      | /api/refund-records/{pk}/        | 某条退款记录                           |
+| GET      | /api/users/{pk}/refund-records/  | 某个用户下的所有退款记录               |
+| GET      | /api/audit-records/              | 所有结算记录                           |
+| POST     | /api/audit-records/              | 创建结算记录                           |
+| GET      | /api/audit-records/{pk}/         | 某条结算记录                           |
+| PUT      | /api/audit-records/{pk}/         | 更新某条结算记录                       |
+| PATCH    | /api/audit-records/{pk}/         | 更新某条结算记录                       |
+| GET      | /api/users/{pk}/audit-records/   | 某个用户下的所有结算记录               |
+| GET      | /api/audit-records/{pk}/items/   | 某条结算记录下的所有项目               |
+| POST     | /api/audit-records/{pk}/items/   | 为某条结算记录的添加项目               |
 
 ## 化验模块
 

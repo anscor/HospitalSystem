@@ -50,7 +50,7 @@ class PayType(models.Model):
         verbose_name="修改者id",
     )
     modify_time = models.DateTimeField(
-        auto_now_add=True, null=True, blank=True, verbose_name="修改时间"
+        auto_now=True, null=True, blank=True, verbose_name="修改时间"
     )
 
     class Meta:
@@ -74,6 +74,7 @@ class PayItem(models.Model):
     )
     # 数量、次数
     count = models.IntegerField(verbose_name="数量")
+    price = models.FloatField(verbose_name="总价")
 
     class Meta:
         verbose_name = "缴费项目"

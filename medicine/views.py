@@ -47,13 +47,15 @@ class MedicineTypeViewSet(viewsets.ModelViewSet):
     @wrap_permission(permissions.IsAdminUser)
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
-    
+
     @wrap_permission(permissions.IsAuthenticated)
-    @action(methods=["GET"], detail=True, url_name="medicine", url_path="medicine")
+    @action(
+        methods=["GET"], detail=True, url_name="medicine", url_path="medicine"
+    )
     def get_medicine(self, request, pk=None):
         if not pk:
             return return_param_error()
-        
+
         t = MedicineType.objects.all().filter(id=pk)
         if not t:
             return return_not_find("药物类型不存在！")

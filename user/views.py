@@ -240,9 +240,10 @@ class GroupViewSet(viewsets.ModelViewSet):
 
         if not hasattr(group, "reservations"):
             return Response(data=[], status=status.HTTP_200_OK)
-        
+
         ser = ReservationSerializer(group.reservations.all(), many=True)
         return Response(data=ser.data, status=status.HTTP_200_OK)
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -341,9 +342,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         data = request.data
         data["username"] = ret.username
-        user_ser = UserSerializer(
-            instance=ret, data=request.data, partial=True
-        )
+        user_ser = UserSerializer(instance=ret, data=request.data, partial=True)
 
         if not user_ser.is_valid():
             return return_param_error()
