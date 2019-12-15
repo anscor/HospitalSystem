@@ -23,7 +23,7 @@ class MedicineType(models.Model):
         verbose_name="修改者id",
     )
     modify_time = models.DateTimeField(
-        auto_now_add=True, null=True, blank=True, verbose_name="修改时间"
+        auto_now=True, null=True, blank=True, verbose_name="修改时间"
     )
 
     class Meta:
@@ -61,7 +61,7 @@ class Medicine(models.Model):
         verbose_name="修改者id",
     )
     modify_time = models.DateTimeField(
-        auto_now_add=True, null=True, blank=True, verbose_name="修改时间"
+        auto_now=True, null=True, blank=True, verbose_name="修改时间"
     )
 
     class Meta:

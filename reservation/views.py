@@ -245,7 +245,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
             return return_forbiden()
 
         data = request.data
-        date = data.get("date", res.data)
+        date = data.get("date", None)
         doctor_id = data.get("doctor", res.doctor_id)
         time_id = data.get("time", None)
         patient_id = data.get("patient", res.patient_id)
@@ -257,12 +257,12 @@ class ReservationViewSet(viewsets.ModelViewSet):
             res.is_cancel = 1
             res.save()
             return return_success("取消预约成功！")
-        
-        
 
         if date:
             date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
             data["date"] = date
+        # TODO: 其他字段检测
+        return return_success("更新预约成功！")
 
     def partial_update(self, request, *args, **kwargs):
         return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)
