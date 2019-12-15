@@ -222,9 +222,9 @@ class ReservationViewSet(viewsets.ModelViewSet):
             return return_param_error("科室不可预约！")
 
         data["is_cancel"] = 0
+        data["is_paid"] = 0
         ser = ReservationSerializer(data=data)
         if not ser.is_valid():
-            print(ser.errors)
             return return_param_error()
 
         ser.save()
@@ -245,12 +245,20 @@ class ReservationViewSet(viewsets.ModelViewSet):
             return return_forbiden()
 
         data = request.data
-        date = data.get("date", None)
-        doctor_id = data.get("doctor", None)
+        date = data.get("date", res.data)
+        doctor_id = data.get("doctor", res.doctor_id)
         time_id = data.get("time", None)
-        patient_id = data.get("patient", None)
-        department_id = data.get("department", None)
+        patient_id = data.get("patient", res.patient_id)
+        department_id = data.get("department", res.department_id)
         is_cancel = data.get("is_cancel", None)
+
+        # 取消预约
+        if is_cancel:
+            res.is_cancel = 1
+            res.save()
+            return return_success("取消预约成功！")
+        
+        
 
         if date:
             date = datetime.datetime.strptime(date, "%Y-%m-%d").date()

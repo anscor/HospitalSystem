@@ -48,6 +48,10 @@ class Reservation(models.Model):
         choices=IS_NOT, verbose_name="是否取消", default=0
     )
 
+    is_paid = models.BooleanField(
+        choices=IS_NOT, verbose_name="是否已经缴费", default=0
+    )
+
     # 下面两个字段相互关联，如果是专家号才会有医生id，如果不是则医生id为空
     is_expert = models.BooleanField(
         choices=IS_NOT, verbose_name="是否为专家号", default=0
