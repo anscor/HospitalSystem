@@ -78,7 +78,7 @@ class GroupViewSet(viewsets.ModelViewSet):
             groups = groups.filter(name=name)
         if not groups:
             return return_not_find("没有相应的组！")
-        ser = GroupSerializer(groups[0])
+        ser = GroupSerializer(groups, many=True)
         return Response(data=ser.data, status=status.HTTP_200_OK)
 
     @wrap_permission(permissions.IsAdminUser)
