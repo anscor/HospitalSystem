@@ -70,7 +70,6 @@ class UserGet(APIView):
 class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         name = request.query_params.get("name", None)
@@ -432,6 +431,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
         ress = Reservation.objects.all()
         pg = Group.objects.get(name="病人")
+        expert = Group.objects.get(name="专家医生")
+        # # 如果请求都是病人
+        # if pg in request.user.groups.all():
+
 
         ser = ReservationSerializer(ress, many=True)
         return Response(data=ser.data, status=status.HTTP_200_OK)

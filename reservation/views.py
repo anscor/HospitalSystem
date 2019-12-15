@@ -21,7 +21,10 @@ from .serializers import *
 class ReservationTimeViewSet(viewsets.ModelViewSet):
     queryset = ReservationTime.objects.all()
     serializer_class = ReservationTimeSerializer
-    # permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    @wrap_permission(permissions.IsAdminUser)
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
     @wrap_permission(permissions.IsAdminUser)
     def create(self, request, *args, **kwargs):
@@ -252,6 +255,9 @@ class ReservationViewSet(viewsets.ModelViewSet):
         if date:
             date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
             data["date"] = date
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @wrap_permission(permissions.IsAdminUser)
     def destroy(self, request, *args, **kwargs):
