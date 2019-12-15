@@ -8,20 +8,19 @@ from django.contrib.auth.models import AnonymousUser
 from rest_framework.views import APIView
 
 from user.permissions import wrap_permission
+from reservation.views import VisitSerializer
 
 
-def return_param_error():
-    return Response(
-        data={"detail": "请求参数出错！"}, status=status.HTTP_400_BAD_REQUEST
-    )
+def return_param_error(msg="请求参数出错！"):
+    return Response(data={"detail": msg}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def return_not_find(msg):
     return Response(data={"detail": msg}, status=status.HTTP_404_NOT_FOUND)
 
 
-def return_forbiden():
-    return Response(data={"detail": "无权限！"}, status=status.HTTP_403_FORBIDDEN)
+def return_forbiden(msg="无权限！"):
+    return Response(data={"detail": msg}, status=status.HTTP_403_FORBIDDEN)
 
 
 def return_success(msg):
@@ -382,6 +381,23 @@ class UserViewSet(viewsets.ModelViewSet):
             return self.add_user_groups(request, pk)
         else:
             return self.get_user_groups(request, pk)
+
+    @action(methods=["GET"], detail=True, url_name="visits", url_path="visits")
+    def get_visit(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+        user = User.objects.filter(id=pk)
+        if not user:
+            return return_not_find("用户不存在！")
+        user = user[0]
+
+        expert = Group.objects.get(name="专家医生")
+        # 对应用户不是专家医生，就不存在坐诊时间
+        if expert not in user.groups.all():
+            return return_param_error()
+
+        ser = VisitSerializer(user.visits, many=True)
+        return Response(data=ser.data, status=status.HTTP_200_OK)
 
 
 class OccupationViewSet(viewsets.ModelViewSet):
