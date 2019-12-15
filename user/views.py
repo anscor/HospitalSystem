@@ -8,7 +8,7 @@ from django.contrib.auth.models import AnonymousUser
 from rest_framework.views import APIView
 
 from user.permissions import wrap_permission
-from reservation.views import VisitSerializer
+from reservation.serializers import VisitSerializer
 
 
 def return_param_error(msg="请求参数出错！"):
@@ -25,6 +25,33 @@ def return_forbiden(msg="无权限！"):
 
 def return_success(msg):
     return Response(data={"detail": msg}, status=status.HTTP_200_OK)
+
+
+def get_all_groups(group, groups=None):
+    """
+    获取组的所有父组（包括自身）
+    """
+    if not group:
+        return None
+
+    ret = groups
+    if not groups:
+        ret = set()
+
+    if group not in ret:
+        ret.add(group)
+    else:
+        return ret
+
+    if not hasattr(group, "profile"):
+        return ret
+
+    pg = group.profile.parent_group
+    if not pg:
+        return ret
+
+    gs = get_all_groups(pg, ret)
+    return ret & gs
 
 
 class UserLogout(APIView):
@@ -261,9 +288,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         data = request.data
         data["username"] = ret.username
-        user_ser = UserSerializer(
-            instance=ret, data=request.data, partial=True
-        )
+        user_ser = UserSerializer(instance=ret, data=request.data, partial=True)
 
         if not user_ser.is_valid():
             return return_param_error()
@@ -377,6 +402,23 @@ class UserViewSet(viewsets.ModelViewSet):
 
         ser = VisitSerializer(user.visits, many=True)
         return Response(data=ser.data, status=status.HTTP_200_OK)
+
+    @action(
+        methods=["GET"],
+        detail=True,
+        url_name="reservations",
+        url_path="reservations",
+    )
+    def get_reservations(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+        user = User.objects.filter(id=pk)
+        if not user:
+            return return_not_find("用户不存在！")
+        user = user[0]
+
+        # TODO: 
+        return return_success()
 
 
 class OccupationViewSet(viewsets.ModelViewSet):

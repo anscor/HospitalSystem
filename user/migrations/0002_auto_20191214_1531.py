@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0001_initial'),
+        ("user", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='groupprofile',
-            name='modify_time',
-            field=models.DateTimeField(auto_now=True, null=True, verbose_name='修改时间'),
+            model_name="groupprofile",
+            name="modify_time",
+            field=models.DateTimeField(
+                auto_now=True, null=True, verbose_name="修改时间"
+            ),
         ),
         migrations.AlterField(
-            model_name='userprofile',
-            name='modify_time',
-            field=models.DateTimeField(auto_now=True, null=True, verbose_name='修改时间'),
+            model_name="userprofile",
+            name="modify_time",
+            field=models.DateTimeField(
+                auto_now=True, null=True, verbose_name="修改时间"
+            ),
         ),
     ]

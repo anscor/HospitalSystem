@@ -6,12 +6,9 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0003_delete_userlogrecord'),
+        ("user", "0003_delete_userlogrecord"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='userprofile',
-            name='age',
-        ),
+        migrations.RemoveField(model_name="userprofile", name="age",),
     ]

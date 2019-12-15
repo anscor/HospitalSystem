@@ -260,7 +260,29 @@
 ##### 成功时 200
 
 ```json
-
+[
+    {
+        "id": 1,
+        "date": "2019-01-01",
+        "is_cancel": false,
+        "is_expert": true,
+        "patient": 14,
+        "department": 232,
+        "time": 2,
+        "doctor": 19
+    },
+    {
+        "id": 2,
+        "date": "2019-01-01",
+        "is_cancel": false,
+        "is_expert": false,
+        "patient": 14,
+        "department": 232,
+        "time": 3,
+        "doctor": null
+    },
+    ...
+]
 ```
 
 ##### 失败时 400 401
@@ -270,6 +292,16 @@
 **POST** /api/reservations/
 
 #### 请求参数
+
+```json
+{
+    "date": "2019-01-01",
+    "patient": 14,	// 此参数如果为管理员创建则必须传入，如果不是则可以不传入（传入也不使用）
+    "department": 232,
+    "time": 2,
+    "doctor": 19	// 可选，传入时表示预约的是专家号
+}
+```
 
 #### 返回参数
 
@@ -286,6 +318,19 @@
 #### 返回参数
 
 ##### 成功时 200
+
+```json
+{
+    "id": 1,
+    "date": "2019-01-01",
+    "is_cancel": false,
+    "is_expert": true,
+    "patient": 14,
+    "department": 232,
+    "time": 2,
+    "doctor": 19
+}
+```
 
 ##### 失败时 400 401 403 404
 

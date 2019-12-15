@@ -1,18 +1,21 @@
-from .models import *
-from .serializers import *
+import datetime
+from os.path import exists
 
-from rest_framework import viewsets, permissions, status
+from django.db.models import Q
+from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 
 from user.permissions import wrap_permission
 from user.views import (
+    get_all_groups,
+    return_forbiden,
+    return_not_find,
     return_param_error,
     return_success,
-    return_not_find,
-    return_forbiden,
 )
 
-import datetime
+from .models import *
+from .serializers import *
 
 
 class ReservationTimeViewSet(viewsets.ModelViewSet):
@@ -88,7 +91,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
-        res = Reservation.objects.all().filter(id=self.kwargs.get("pk", ""))
+        res = Reservation.objects.all().filter(id=self.kwargs.get("pk", 0))
         if not res:
             return return_not_find("预约不存在！")
         res = res[0]
@@ -96,8 +99,8 @@ class ReservationViewSet(viewsets.ModelViewSet):
         # 如果请求的用户不是该预约的病人、医生或者不是管理员时无权限
         if (
             not res.patient == request.user
-            or not res.doctor == request.user
-            or not request.user.is_staff
+            and not res.doctor == request.user
+            and not request.user.is_staff
         ):
             return return_forbiden()
 
@@ -109,7 +112,10 @@ class ReservationViewSet(viewsets.ModelViewSet):
         # 不是管理员时无权指定病人
         if not request.user.is_staff:
             data["patient"] = request.user.id
-        
+        # 是管理员时必须指定病人
+        elif request.user.is_staff and not data.get("patient", None):
+            return return_param_error()
+
         # 转换日期
         date = data.get("date", None)
         if not date:
@@ -128,14 +134,14 @@ class ReservationViewSet(viewsets.ModelViewSet):
         # 已经预约了的人数
         num = Reservation.objects.all().filter(time=time_id).count()
         if num >= time.patient_num:
-            return return_param_error("超过最大预约数，不可预约！")
+            return return_param_error("超过最大预约人数，不可预约！")
 
         doctor_id = data.get("doctor", None)
         # 没有指定医生时，代表是普通预约
         if not doctor_id:
-            data["is_expert"] = False
+            data["is_expert"] = 0
         else:
-            data["is_expert"] = True
+            data["is_expert"] = 1
             # 得到指定的医生
             doctor = User.objects.all().filter(id=doctor_id)
             if not doctor:
@@ -146,25 +152,90 @@ class ReservationViewSet(viewsets.ModelViewSet):
             expert = Group.objects.get(name="专家医生")
             if expert not in doctor.groups.all():
                 return return_param_error("只能指定专家医生！")
-            
+
             # 验证专家是否出诊
-            ds = [v.date for v in doctor.visits]
-            if date not in ds:
+            visit = Visit.objects.all().filter(
+                Q(doctor_id=doctor_id)
+                & Q(date=date)
+                & Q(start__lte=time.start)
+                & Q(end__gte=time.end)
+            )
+
+            if not visit:
                 return return_param_error("专家在此时间不出诊！")
-            
+
+            visit = visit[0]
+
             # 验证专家是否还可预约
-            # num = Reservation.objects.all().filter()
+            num = (
+                Reservation.objects.all()
+                .filter(Q(is_expert=1) & Q(doctor_id=doctor_id))
+                .count()
+            )
+            if num >= visit.patient_num:
+                return return_param_error("超过最大预约人数，不可预约！")
 
             data["doctor"] = doctor.id
 
-        
+        # 验证是不是已经有过预约
+        if (
+            Reservation.objects.all()
+            .filter(Q(patient_id=data.get("patient", 0)) & Q(time_id=time_id))
+            .exists()
+        ):
+            return return_param_error("此时间段已经预约，不可重复预约！")
+
+        # 验证科室是否可以预约
+        department = Group.objects.all().filter(
+            id=request.data.get("department", 0)
+        )
+        if not department:
+            return return_param_error("必须指定科室！")
+        department = department[0]
+
+        ds = get_all_groups(department)
+        able = Group.objects.get(name="可预约科室")
+        if able not in ds:
+            return return_param_error("科室不可预约！")
+
+        data["is_cancel"] = 0
         ser = ReservationSerializer(data=data)
         if not ser.is_valid():
             print(ser.errors)
             return return_param_error()
-        
+
         ser.save()
         return return_success("预约成功！")
+
+    def update(self, request, *args, **kwargs):
+        res = Reservation.objects.all().filter(id=self.kwargs.get("pk", 0))
+        if not res:
+            return return_not_find("预约不存在！")
+        res = res[0]
+
+        # 如果请求的用户不是该预约的病人、医生或者不是管理员时无权限
+        if (
+            not res.patient == request.user
+            and not res.doctor == request.user
+            and not request.user.is_staff
+        ):
+            return return_forbiden()
+
+        data = request.data
+        date = data.get("date", None)
+        doctor_id = data.get("doctor", None)
+        time_id = data.get("time", None)
+        patient_id = data.get("patient", None)
+        department_id = data.get("department", None)
+        is_cancel = data.get("is_cancel", None)
+
+        if date:
+            date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+            data["date"] = date
+
+    @wrap_permission(permissions.IsAdminUser)
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
 
 class VisitViewSet(viewsets.ModelViewSet):
@@ -173,11 +244,11 @@ class VisitViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        '''
+        """
         分为两种情况
         1. 管理员创建，此时需要传入doctor来指定医生
         2. 专家医生创建，此时可不传入doctor（传入也不使用）
-        '''
+        """
         data = request.data
         doctor_id = request.data.pop("doctor", None)
         date = data.get("date", None)
@@ -190,10 +261,13 @@ class VisitViewSet(viewsets.ModelViewSet):
         # 管理员请求但没有传入doctor
         if not doctor_id and request.user.is_staff:
             return return_param_error()
-        
+
         expert = Group.objects.get(name="专家医生")
         # 请求者不是专家医生、不是管理员时无权限
-        if expert not in request.user.groups.all() and not request.user.is_staff:
+        if (
+            expert not in request.user.groups.all()
+            and not request.user.is_staff
+        ):
             return return_forbiden()
 
         doctor = request.user
@@ -207,7 +281,7 @@ class VisitViewSet(viewsets.ModelViewSet):
             # 指定的doctor不是专家医生
             if expert not in doctor.groups.all():
                 return return_param_error()
-            
+
         # 转换时间
         date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
         start = datetime.datetime.strptime(start, "%H:%M").time()
@@ -221,7 +295,7 @@ class VisitViewSet(viewsets.ModelViewSet):
         ser = VisitSerializer(data=data)
         if not ser.is_valid():
             return return_param_error()
-        
+
         ser.save()
         return return_success("创建成功！")
 
@@ -234,23 +308,23 @@ class VisitViewSet(viewsets.ModelViewSet):
         # 不是坐诊时间相关医生、不是管理员时没有操作权限
         if request.user != visit.doctor and not request.user.is_staff:
             return return_forbiden()
-        
+
         # 如果是专家医生，不允许指定医生
         if not request.user.is_staff:
             request.data.pop("doctor")
-        
+
         data = request.data
         # 时期、时间转换
         date = data.get("date", None)
         if date:
             date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
             data["date"] = date
-        
+
         start = data.get("start", None)
         if start:
             start = datetime.datetime.strptime(start, "%H:%M").time()
             data["start"] = start
-        
+
         end = data.get("end", None)
         if end:
             end = datetime.datetime.strptime(end, "%H:%M").time()
@@ -261,10 +335,10 @@ class VisitViewSet(viewsets.ModelViewSet):
             return return_param_error()
         ser.save()
         return return_success("更新成功！")
-    
+
     def partial_update(self, request, *args, **kwargs):
         return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    
+
     def destroy(self, request, *args, **kwargs):
         visit = Visit.objects.filter(id=self.kwargs.get("pk", 0))
         if not visit:
