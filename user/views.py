@@ -78,7 +78,7 @@ class GroupViewSet(viewsets.ModelViewSet):
             groups = groups.filter(name=name)
         if not groups:
             return return_not_find("没有相应的组！")
-        ser = GroupSerializer(groups)
+        ser = GroupSerializer(groups[0])
         return Response(data=ser.data, status=status.HTTP_200_OK)
 
     @wrap_permission(permissions.IsAdminUser)
@@ -273,13 +273,18 @@ class UserViewSet(viewsets.ModelViewSet):
             return return_param_error()
 
     def retrieve(self, request, *args, **kwargs):
-        user = User.objects.all().filter(id=self.kwargs.get("pk", ""))
+        user = User.objects.all().filter(id=self.kwargs.get("pk", 0))
 
-        ret, success = self._checkIsOwnerOrAdminUser(user, request)
-        if not success:
-            return ret
+        if not user:
+            return return_not_find("用户不存在！")
+        user = user[0]
 
-        ser = UserSerializer(ret)
+        # 如果请求者是病人，则不能查看别人的信息
+        g = Group.objects.get(name="病人")
+        if g in request.user.groups.all() and user != request.user:
+            return return_forbiden()
+        
+        ser = UserSerializer(user)
         return Response(ser.data, status=status.HTTP_200_OK)
 
     @wrap_permission(permissions.IsAdminUser)
@@ -415,6 +420,7 @@ class UserViewSet(viewsets.ModelViewSet):
         ser = VisitSerializer(user.visits, many=True)
         return Response(data=ser.data, status=status.HTTP_200_OK)
 
+    @wrap_permission(permissions.IsAuthenticated)
     @action(
         methods=["GET"],
         detail=True,
@@ -432,9 +438,17 @@ class UserViewSet(viewsets.ModelViewSet):
         ress = Reservation.objects.all()
         pg = Group.objects.get(name="病人")
         expert = Group.objects.get(name="专家医生")
-        # # 如果请求都是病人
-        # if pg in request.user.groups.all():
-
+        # 如果请求都是病人
+        if pg in request.user.groups.all():
+            if user != request.user:
+                return return_forbiden()
+            ress = ress.filter(patient_id=user.id)
+        # 请求者是对应的专家医生
+        elif expert in request.user.groups.all():
+            ress = ress.filter(doctor_id=request.user.id)
+        # 并且请求都也不是管理员，无权限访问
+        elif not request.user.is_staff:
+            return return_forbiden()
 
         ser = ReservationSerializer(ress, many=True)
         return Response(data=ser.data, status=status.HTTP_200_OK)
