@@ -208,7 +208,7 @@ class GroupViewSet(viewsets.ModelViewSet):
         group.user_set.add(user)
         return return_success("添加成功！")
 
-    @wrap_permission(permissions.IsAdminUser)
+    @wrap_permission(permissions.IsAuthenticated)
     @action(
         methods=["POST", "GET"],
         detail=True,
