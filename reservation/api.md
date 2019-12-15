@@ -374,6 +374,32 @@
 
 #### 返回参数
 
+```json
+[
+    {
+        "id": 1,
+        "date": "2019-01-01",
+        "is_cancel": false,
+        "is_expert": true,
+        "patient": 14,
+        "department": 232,
+        "time": 2,
+        "doctor": 19
+    },
+    {
+        "id": 2,
+        "date": "2019-01-01",
+        "is_cancel": false,
+        "is_expert": false,
+        "patient": 14,
+        "department": 232,
+        "time": 3,
+        "doctor": null
+    },
+    ...
+]
+```
+
 ##### 成功时 200
 
 ##### 失败时 400 401 403 404
@@ -389,5 +415,31 @@
 #### 返回参数
 
 ##### 成功时 200
+
+```json
+[
+    {
+        "id": 1,
+        "date": "2019-01-01",
+        "is_cancel": false,
+        "is_expert": true,
+        "patient": 14,
+        "department": 232,
+        "time": 2,
+        "doctor": 19
+    },
+    {
+        "id": 2,
+        "date": "2019-01-01",
+        "is_cancel": false,
+        "is_expert": false,
+        "patient": 14,
+        "department": 232,
+        "time": 3,
+        "doctor": null
+    },
+    ...
+]
+```
 
 ##### 失败时 400 401 403 404

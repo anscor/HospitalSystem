@@ -65,7 +65,8 @@ class UserGet(APIView):
     def get(self, request, *args, **kwargs):
         ser = UserSerializer(request.user)
         return Response(data=ser.data, status=status.HTTP_200_OK)
-    
+
+
 class Department(APIView):
     def get(self, request, *args, **kwargs):
         group = Group.objects.all().filter(name="可预约科室")
@@ -221,6 +222,28 @@ class GroupViewSet(viewsets.ModelViewSet):
         else:
             return self.get_group_users(request, pk)
 
+    @wrap_permission(permissions.IsAuthenticated)
+    @action(
+        methods=["GET"],
+        detail=True,
+        url_name="reservations",
+        url_path="reservations",
+    )
+    def get_reservations(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+
+        group = Group.objects.filter(id=pk)
+        if not group:
+            return return_not_find("用户组不存在！")
+        group = group[0]
+
+        if not hasattr(group, "reservations"):
+            return Response(data=[], status=status.HTTP_200_OK)
+        
+        ser = ReservationSerializer(group.reservations.all(), many=True)
+        return Response(data=ser.data, status=status.HTTP_200_OK)
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -296,7 +319,7 @@ class UserViewSet(viewsets.ModelViewSet):
         g = Group.objects.get(name="病人")
         if g in request.user.groups.all() and user != request.user:
             return return_forbiden()
-        
+
         ser = UserSerializer(user)
         return Response(ser.data, status=status.HTTP_200_OK)
 
@@ -318,7 +341,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
         data = request.data
         data["username"] = ret.username
-        user_ser = UserSerializer(instance=ret, data=request.data, partial=True)
+        user_ser = UserSerializer(
+            instance=ret, data=request.data, partial=True
+        )
 
         if not user_ser.is_valid():
             return return_param_error()
