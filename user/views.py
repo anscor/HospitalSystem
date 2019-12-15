@@ -65,6 +65,20 @@ class UserGet(APIView):
     def get(self, request, *args, **kwargs):
         ser = UserSerializer(request.user)
         return Response(data=ser.data, status=status.HTTP_200_OK)
+    
+class Department(APIView):
+    def get(self, request, *args, **kwargs):
+        group = Group.objects.all().filter(name="可预约科室")
+        if not group:
+            return Response(data="", status=status.HTTP_200_OK)
+        group = group[0]
+        if not hasattr(group, "children_groups"):
+            return Response(data="", status=status.HTTP_200_OK)
+
+        gs = group.children_groups.all()
+        groups = [g.group for g in gs]
+        ser = GroupSerializer(groups, many=True)
+        return Response(data=ser.data, status=status.HTTP_200_OK)
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -206,7 +220,6 @@ class GroupViewSet(viewsets.ModelViewSet):
             return self.add_group_users(request, pk)
         else:
             return self.get_group_users(request, pk)
-
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()

@@ -277,6 +277,39 @@
 
 ##### 失败时 401
 
+### 所有可预约的科室信息
+
+**GET** /api/departments/
+
+#### 返回参数
+
+##### 成功时 200
+
+```json
+[
+    {
+        "id": 221,
+        "name": "化验科",
+        "profile": {
+            "location": "化验科地址",
+            "contact_phone": "18812341234",
+            "create_time": "2019-12-14T17:16:02.911170",
+            "modify_time": "2019-12-14T17:16:02.911170",
+            "group": 221,
+            "parent_group": 238,
+            "creator": 1,
+            "modifier": null
+        }
+    },
+    {
+        "id": 218,
+        "name": "医生",
+        "profile": null
+    },
+    ...
+]
+```
+
 ### 添加组
 
 **POST** /api/groups/

@@ -64,6 +64,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 | PUT      | /api/users/{pk}/             | 更新某个用户信息（本人可用）（完成）         |
 | GET      | /api/groups/                 | 所有组信息（完成）                           |
 | POST     | /api/groups/                 | 添加组（管理员可用）（完成）                 |
+| GET      | /api/departments/            | 所有可预约的科室信息（完成）                 |
 | GET      | /api/groups/?name=           | 某个组信息（完成）                           |
 | GET      | /api/groups/{pk}/            | 某个组信息（完成）                           |
 | PUT      | /api/groups/{pk}/            | 修改某个组信息（管理员可用）（完成）         |
