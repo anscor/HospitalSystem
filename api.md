@@ -83,18 +83,18 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 
 ## 门诊模块
 
-| 请求方法 | 地址                             | 说明                   |
-| -------- | -------------------------------- | ---------------------- |
-| GET      | /api/medical-records/            | 所有病历               |
-| POST     | /api/medical-records/            | 创建病历               |
-| PUT      | /api/medical-records/{pk}/       | 更新某条病历           |
-| GET      | /api/medical-records/{pk}/       | 某条病历               |
-| PATCH    | /api/medical-records/{pk}/       | 更新某条病历           |
-| GET      | /api/users/{pk}/medical-records/ | 某个用户下的所有病历   |
-| GET      | /api/prescriptions/              | 所有处方签（完成）     |
-| POST     | /api/prescriptions/              | 添加处方签（完成）     |
-| GET      | /api/prescriptions/{pk}/         | 某条处方签（完成）     |
-| GET      | /api/users/{pk}/prescriptions/   | 某个用户下的所有处方签 |
+| 请求方法 | 地址                             | 说明                           |
+| -------- | -------------------------------- | ------------------------------ |
+| GET      | /api/medical-records/            | 所有病历                       |
+| POST     | /api/medical-records/            | 创建病历                       |
+| PUT      | /api/medical-records/{pk}/       | 更新某条病历                   |
+| GET      | /api/medical-records/{pk}/       | 某条病历                       |
+| PATCH    | /api/medical-records/{pk}/       | 更新某条病历                   |
+| GET      | /api/users/{pk}/medical-records/ | 某个用户下的所有病历           |
+| GET      | /api/prescriptions/              | 所有处方签（完成）             |
+| POST     | /api/prescriptions/              | 添加处方签（完成）             |
+| GET      | /api/prescriptions/{pk}/         | 某条处方签（完成）             |
+| GET      | /api/users/{pk}/prescriptions/   | 某个用户下的所有处方签（完成） |
 
 ## 财务模块
 

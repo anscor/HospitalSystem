@@ -10,6 +10,10 @@ from rest_framework.views import APIView
 from user.permissions import wrap_permission
 from reservation.serializers import VisitSerializer, ReservationSerializer
 from reservation.models import Reservation
+from outpatient.serializers import (
+    PrescriptionSerializer,
+    PrescriptionItemSerializer,
+)
 
 
 def return_param_error(msg="请求参数出错！"):
@@ -342,7 +346,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
         data = request.data
         data["username"] = ret.username
-        user_ser = UserSerializer(instance=ret, data=request.data, partial=True)
+        user_ser = UserSerializer(
+            instance=ret, data=request.data, partial=True
+        )
 
         if not user_ser.is_valid():
             return return_param_error()
@@ -489,6 +495,42 @@ class UserViewSet(viewsets.ModelViewSet):
 
         ser = ReservationSerializer(ress, many=True)
         return Response(data=ser.data, status=status.HTTP_200_OK)
+
+    @wrap_permission(permissions.IsAuthenticated)
+    @action(
+        methods=["GET"],
+        detail=True,
+        url_name="prescriptions",
+        url_path="prescriptions",
+    )
+    def get_prescriptions(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+        user = User.objects.filter(id=pk)
+        if not user:
+            return return_not_find("用户不存在！")
+        user = user[0]
+
+        pg = Group.objects.get(name="病人")
+        d = Group.objects.get(name="医生")
+
+        data = []
+        pres = None
+        if pg in user.groups.all():
+            if hasattr(user, "get_prescriptions"):
+                pres = user.get_prescriptions.all()
+        elif d in user.groups.all():
+            if hasattr(user, "created_prescriptions"):
+                pres = user.created_prescriptions.all()
+
+        if pres:
+            for pre in pres:
+                d = PrescriptionSerializer(pre).data
+                if hasattr(pre, "items"):
+                    d["items"] = PrescriptionItemSerializer(pre.items, many=True).data
+                data.append(d)
+
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
 class OccupationViewSet(viewsets.ModelViewSet):
