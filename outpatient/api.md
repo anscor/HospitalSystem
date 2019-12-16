@@ -184,3 +184,135 @@
 ##### 失败时 401 404
 
 ## 病历相关
+
+### 创建病历
+
+**POST** /api/medical-records/
+
+#### 请求参数
+
+```json
+{
+    "patient": 1,
+    "department": 1,
+    "onset_date": "2019-01-01",
+    "diagnosis": "医生对病人的诊断",
+    "detail": "医生对病情的详细描述", // 可不传入
+    "patient_description": "病人自己的描述", // 可不传入
+    "onset_history": "发病史", // 可不传入
+    "medicine_history": "药物史" // 可不传入
+}
+```
+
+#### 响应参数
+
+##### 200 400 401
+
+### 所有病历
+
+**GET** /api/medical-records/
+
+#### 响应参数
+
+##### 成功时 200
+
+```json
+[
+    {
+        "id": 1,
+        "onset_date": "2019-01-01",	// 发病日期
+        "diagnosis": "医生对病人的诊断",
+        "detail": "医生对病情的详细描述",
+        "patient_description": "病人自己的描述",
+        "onset_history": "发病史",
+        "time": "2019-12-16T20:56:10.587306",	// 就诊时间，由系统添加
+        "medicine_history": "药物史",
+        "can_modify": true,	// 是否可以编辑
+        "create_time": "2019-12-16T20:56:10.684305",
+        "modify_time": "2019-12-16T20:56:10.684305",
+        "patient": 14,	// 病人id
+        "department": 233,	// 科室id
+        "creator": 19,	// 创建者（一般为医生）id
+        "modifier": null	// 修改者（一般为医生）id
+    },
+    ...
+]
+```
+
+##### 失败时 401
+
+### 某条病历
+
+**GET** /api/medical-records/{pk}/
+
+#### 请求参数
+
+- pk：病历id。
+
+#### 响应参数
+
+##### 成功时 200
+
+```json
+{
+    "id": 1,
+    "onset_date": "2019-01-01",	// 发病日期
+    "diagnosis": "医生对病人的诊断",
+    "detail": "医生对病情的详细描述",
+    "patient_description": "病人自己的描述",
+    "onset_history": "发病史",
+    "time": "2019-12-16T20:56:10.587306",	// 就诊时间，由系统添加
+    "medicine_history": "药物史",
+    "can_modify": true,	// 是否可以编辑
+    "create_time": "2019-12-16T20:56:10.684305",
+    "modify_time": "2019-12-16T20:56:10.684305",
+    "patient": 14,	// 病人id
+    "department": 233,	// 科室id
+    "creator": 19,	// 创建者（一般为医生）id
+    "modifier": null	// 修改者（一般为医生）id
+}
+```
+
+##### 失败时 401 404
+
+### 更新某条病历
+
+**PUT** /api/medical-records/{pk}/
+
+#### 请求参数
+
+- pk：病历id。
+
+以下所有参数均可不传入。
+
+```json
+{
+    "onset_date": "2019-01-01",
+    "diagnosis": "医生对病人的诊断",
+    "detail": "医生对病情的详细描述",
+    "patient_description": "病人自己的描述",
+    "onset_history": "发病史",
+    "medicine_history": "药物史",
+    "can_modify": 0
+}
+```
+
+#### 响应参数
+
+##### 200 400 401 404
+
+### 某个用户下的所有病历
+
+**GET** /api/users/{pk}/medical-records/
+
+#### 请求参数
+
+- pk：用户id。
+
+#### 响应参数
+
+##### 成功时 200
+
+与**所有病历**响应参数相同。
+
+##### 失败时 400 401 404

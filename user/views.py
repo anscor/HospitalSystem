@@ -13,6 +13,7 @@ from reservation.models import Reservation
 from outpatient.serializers import (
     PrescriptionSerializer,
     PrescriptionItemSerializer,
+    MedicalRecordSerializer,
 )
 
 
@@ -346,9 +347,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         data = request.data
         data["username"] = ret.username
-        user_ser = UserSerializer(
-            instance=ret, data=request.data, partial=True
-        )
+        user_ser = UserSerializer(instance=ret, data=request.data, partial=True)
 
         if not user_ser.is_valid():
             return return_param_error()
@@ -527,8 +526,42 @@ class UserViewSet(viewsets.ModelViewSet):
             for pre in pres:
                 d = PrescriptionSerializer(pre).data
                 if hasattr(pre, "items"):
-                    d["items"] = PrescriptionItemSerializer(pre.items, many=True).data
+                    d["items"] = PrescriptionItemSerializer(
+                        pre.items, many=True
+                    ).data
                 data.append(d)
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @wrap_permission(permissions.IsAuthenticated)
+    @action(
+        methods=["GET"],
+        detail=True,
+        url_path="medical-records",
+        url_name="medical-records",
+    )
+    def get_medical_records(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+        user = User.objects.filter(id=pk)
+        if not user:
+            return return_not_find("用户不存在！")
+        user = user[0]
+
+        pg = Group.objects.get(name="病人")
+        d = Group.objects.get(name="医生")
+
+        data = []
+        if pg in user.groups.all():
+            if hasattr(user, "medical_records"):
+                data = MedicalRecordSerializer(
+                    user.medical_records, many=True
+                ).data
+        elif d in user.groups.all():
+            if hasattr(user, "created_medical_records"):
+                data = MedicalRecordSerializer(
+                    user.created_medical_records, many=True
+                ).data
 
         return Response(data=data, status=status.HTTP_200_OK)
 

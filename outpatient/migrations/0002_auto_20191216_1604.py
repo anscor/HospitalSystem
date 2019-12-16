@@ -9,18 +9,25 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('outpatient', '0001_initial'),
+        ("outpatient", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='prescription',
-            name='midifier',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='modifier_prescriptions', to=settings.AUTH_USER_MODEL, verbose_name='修改者id'),
+            model_name="prescription",
+            name="midifier",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="modifier_prescriptions",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="修改者id",
+            ),
         ),
         migrations.AddField(
-            model_name='prescription',
-            name='modify_time',
-            field=models.DateTimeField(auto_now=True, verbose_name='修改时间'),
+            model_name="prescription",
+            name="modify_time",
+            field=models.DateTimeField(auto_now=True, verbose_name="修改时间"),
         ),
     ]

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User, Group
 
 class MedicalRecord(models.Model):
     # 病人
-    user = models.ForeignKey(
+    patient = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
         related_name="medical_records",
@@ -53,7 +53,7 @@ class MedicalRecord(models.Model):
         verbose_name="修改者id",
     )
     modify_time = models.DateTimeField(
-        auto_now_add=True, null=True, blank=True, verbose_name="修改时间"
+        auto_now=True, null=True, blank=True, verbose_name="修改时间"
     )
 
     class Meta:

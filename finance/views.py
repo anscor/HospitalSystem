@@ -82,7 +82,7 @@ class PayRecordViewSet(viewsets.ModelViewSet):
                 "record": record.id,
                 "name": pay_type.name,
                 "count": 1,
-                "price": pay_type.price
+                "price": pay_type.price,
             }
             ser = PayItemSerializer(data=data)
             if not ser.is_valid():
@@ -92,7 +92,7 @@ class PayRecordViewSet(viewsets.ModelViewSet):
         else:
             if not hasattr(obj, "items"):
                 return return_param_error()
-            
+
             data = []
             items = obj.items.all()
             # 如果是化验单
@@ -102,7 +102,7 @@ class PayRecordViewSet(viewsets.ModelViewSet):
                         "record": record.id,
                         "name": item.laboratory_type.name,
                         "count": 1,
-                        "price": item.laboratory_type.price
+                        "price": item.laboratory_type.price,
                     }
                     data.append(d)
             else:
@@ -111,7 +111,7 @@ class PayRecordViewSet(viewsets.ModelViewSet):
                         "record": record.id,
                         "name": item.medicine.name,
                         "count": 1,
-                        "price": item.medicine.price
+                        "price": item.medicine.price,
                     }
                     data.append(d)
             ser = PayItemSerializer(data=data, many=True)
