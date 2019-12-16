@@ -110,8 +110,6 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 | DELETE   | /api/pay-types/{pk}/             | 删除某种缴费类型（管理员可用）（完成）       |
 | GET      | /api/pay-types/{pk}/pay-records/ | 某种缴费类型下的所有缴费记录                 |
 | GET      | /api/users/{pk}/pay-records/     | 某个用户下的所有缴费记录                     |
-| GET      | /api/pay-records/{pk}/items/     | 某条缴费记录下的所有项目                     |
-| POST     | /api/pay-records/{pk}/items/     | 为某条缴费记录的添加项目                     |
 | GET      | /api/refund-records/             | 所有退款记录                                 |
 | POST     | /api/refund-records/             | 创建退款记录                                 |
 | GET      | /api/refund-records/{pk}/        | 某条退款记录                                 |
@@ -122,23 +120,20 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 | PUT      | /api/audit-records/{pk}/         | 更新某条结算记录                             |
 | PATCH    | /api/audit-records/{pk}/         | 更新某条结算记录                             |
 | GET      | /api/users/{pk}/audit-records/   | 某个用户下的所有结算记录                     |
-| GET      | /api/audit-records/{pk}/items/   | 某条结算记录下的所有项目                     |
-| POST     | /api/audit-records/{pk}/items/   | 为某条结算记录的添加项目                     |
 
 ## 化验模块
 
-| 请求方法 | 地址                                     | 说明                       |
-| :------- | ---------------------------------------- | -------------------------- |
-| GET      | /api/laboratories/                       | 所有化验单                 |
-| POST     | /api/laboratories/                       | 添加化验单                 |
-| GET      | /api/laboratories/{id}/                  | 某条化验单                 |
-| GET      | /api/users/{id}/laboratories/            | 某个用户下的所有化验单     |
-| GET      | /api/laboratory-types/                   | 所有化验类型               |
-| POST     | /api/laboratory-types/                   | 添加化验类型               |
-| GET      | /api/laboratory-types/{id}/              | 某个化验类型               |
-| GET      | /api/laboratory-types/{id}/laboratories/ | 某个化验类型下的所有化验单 |
-| GET      | /api/laboratories/{id}/items/            | 某条化验单下的所有项目     |
-| POST     | /api/laboratories/{id}/items/            | 为条化验单的添加项目       |
+| 请求方法 | 地址                                     | 说明                                   |
+| :------- | ---------------------------------------- | -------------------------------------- |
+| GET      | /api/laboratories/                       | 所有化验单                             |
+| POST     | /api/laboratories/                       | 添加化验单                             |
+| GET      | /api/laboratories/{pk}/                  | 某条化验单                             |
+| GET      | /api/users/{pk}/laboratories/            | 某个用户下的所有化验单                 |
+| GET      | /api/laboratory-types/                   | 所有化验类型（完成）                   |
+| POST     | /api/laboratory-types/                   | 添加化验类型（管理员可用）（完成）     |
+| GET      | /api/laboratory-types/{pk}/              | 某个化验类型（完成）                   |
+| DELETE   | /api/laboratory-types/{pk}/              | 删除某个化验类型（管理员可用）（完成） |
+| GET      | /api/laboratory-types/{pk}/laboratories/ | 某个化验类型下的所有化验单             |
 
 ## 药房模块
 

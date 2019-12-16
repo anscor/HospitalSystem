@@ -35,6 +35,14 @@ class LaboratoryType(models.Model):
     name = models.CharField(max_length=256, verbose_name="类型名称")
     price = models.FloatField(verbose_name="价格")
 
+    creator = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name="created_laboratory_types",
+        verbose_name="创建者id",
+    )
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
     class Meta:
         verbose_name = "化验类型"
         verbose_name_plural = "化验类型"
