@@ -16,8 +16,6 @@ class PayItemSerializer(serializers.ModelSerializer):
 
 
 class PayRecordSerializer(serializers.ModelSerializer):
-    items = PayItemSerializer(required=False)
-
     class Meta:
         model = PayRecord
         fields = "__all__"

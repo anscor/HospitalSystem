@@ -160,7 +160,7 @@ class GroupViewSet(viewsets.ModelViewSet):
             profile_ser.save()
 
         group_ser.save()
-        return return_success()
+        return return_success("修改成功！")
 
     def partial_update(self, request, *args, **kwargs):
         return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)

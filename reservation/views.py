@@ -223,6 +223,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
         data["is_cancel"] = 0
         data["is_paid"] = 0
+        data["is_finish"] = 0
         ser = ReservationSerializer(data=data)
         if not ser.is_valid():
             return return_param_error()

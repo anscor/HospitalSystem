@@ -1,7 +1,8 @@
 from .models import *
 from .serializers import *
 
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
+from rest_framework.response import Response
 
 from laboratory.models import Laboratory
 from outpatient.models import Prescription
@@ -12,6 +13,7 @@ from user.views import (
     return_forbiden,
     return_success,
 )
+from reservation.models import Reservation
 
 
 class PayTypeViewSet(viewsets.ModelViewSet):
@@ -37,6 +39,7 @@ class PayRecordViewSet(viewsets.ModelViewSet):
     serializer_class = PayRecordSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    # 只是创建，但并不缴费，缴费通过更新来实现
     def create(self, request, *args, **kwargs):
         pay_type_id = request.data.get("type", None)
         re_id = request.data.get("id", None)
@@ -50,6 +53,7 @@ class PayRecordViewSet(viewsets.ModelViewSet):
         pay_type = pay_type[0]
 
         data = {}
+        # 默认为预约费用，此时的病人为请求者
         data["patient"] = request.user.id
         data["creator"] = request.user.id
         data["pay_type"] = pay_type_id
@@ -57,18 +61,25 @@ class PayRecordViewSet(viewsets.ModelViewSet):
         # 更改patient
         obj = None
         if pay_type.name == "化验单费用":
-            obj = Laboratory.objects.filter(id=re_id)
+            # 检查化验单是否存在
+            obj = Laboratory.objects.all().filter(id=re_id)
             if not obj:
                 return return_param_error()
-            obj = obj[0]
             data["patient"] = obj.patient_id
         elif pay_type.name == "处方签费用":
-            obj = Prescription.objects.filter(id=re_id)
+            # 检查处方是否存在
+            obj = Prescription.objects.all().filter(id=re_id)
             if not obj:
                 return return_param_error()
-            obj = obj[0]
             data["patient"] = obj.patient_id
+        # 预约费用
+        else:
+            # 检查预约是否存在
+            obj = Reservation.objects.all().filter(id=re_id)
+            if not obj:
+                return return_param_error()
 
+        obj = obj[0]
         # 创建记录
         ser = PayRecordSerializer(data=data)
         if not ser.is_valid():
@@ -76,8 +87,7 @@ class PayRecordViewSet(viewsets.ModelViewSet):
         record = ser.save()
 
         # 创建对应item
-        # 没有obj则代表是预约费用
-        if not obj:
+        if isinstance(obj, Reservation):
             data = {
                 "record": record.id,
                 "name": pay_type.name,
@@ -88,8 +98,13 @@ class PayRecordViewSet(viewsets.ModelViewSet):
             if not ser.is_valid():
                 return return_param_error()
             ser.save()
+
+            # 修改预约为已经缴费
+            obj.is_paid = True
+            obj.save()
             return return_success("创建成功！")
         else:
+            # 如果对应处方、化验单没有对应的条目（不允许这种情况出现）
             if not hasattr(obj, "items"):
                 return return_param_error()
 
@@ -105,6 +120,7 @@ class PayRecordViewSet(viewsets.ModelViewSet):
                         "price": item.laboratory_type.price,
                     }
                     data.append(d)
+            # 如果是处方签
             else:
                 for item in items:
                     d = {
@@ -114,6 +130,7 @@ class PayRecordViewSet(viewsets.ModelViewSet):
                         "price": item.medicine.price,
                     }
                     data.append(d)
+
             ser = PayItemSerializer(data=data, many=True)
             if not ser.is_valid():
                 print(ser.errors)
@@ -122,4 +139,50 @@ class PayRecordViewSet(viewsets.ModelViewSet):
             return return_success("创建成功！")
 
     def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
+        record = PayRecordSerializer.objects.all().filter(
+            id=self.kwargs.get("pk", 0)
+        )
+        if not record:
+            return return_not_find("缴费记录不存在！")
+        record = record[0]
+
+        receive = request.data.get("receive", None)
+        refund = request.data.get("refund", None)
+        method = request.data.get("method", None)
+
+        if not all((receive, method)):
+            return return_param_error()
+
+        data = {
+            "receive": receive,
+            "method": method,
+            "refund": refund if refund else 0,
+        }
+
+        ser = PayRecordSerializer(instance=record, data=data, partial=True)
+        if not ser.is_valid():
+            print(ser.errors)
+            return return_param_error()
+
+        ser.save()
+        return return_success("修改成功！")
+
+    def list(self, request, *args, **kwargs):
+        records = PayRecord.objects.all()
+
+        data = []
+        for record in records:
+
+            pass
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @wrap_permission(permissions.IsAdminUser)
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
