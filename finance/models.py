@@ -1,33 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-PAY_METHOD = ((0, "现金"), (1, "银联"), (2, "支付宝"), (3, "微信"))
-
-
-class PayRecord(models.Model):
-    patient = models.ForeignKey(
-        User,
-        on_delete=models.DO_NOTHING,
-        related_name="paid_records",
-        verbose_name="病人id",
-    )
-
-    receive = models.FloatField(verbose_name="收款金额")
-    refund = models.FloatField(verbose_name="找零")
-    method = models.IntegerField(choices=0, verbose_name="收款方式", default=0)
-
-    creator = models.ForeignKey(
-        User,
-        on_delete=models.DO_NOTHING,
-        related_name="created_pay_records",
-        verbose_name="创建者id",
-    )
-    create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
-
-    class Meta:
-        verbose_name = "缴费记录"
-        verbose_name_plural = "缴费记录"
-        db_table = "pay_record"
+PAY_METHOD = ((0, "未付款"), (1, "现金"), (2, "银联"), (3, "支付宝"), (4, "微信"))
 
 
 class PayType(models.Model):
@@ -59,6 +33,50 @@ class PayType(models.Model):
         db_table = "pay_type"
 
 
+class PayRecord(models.Model):
+    patient = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name="paid_records",
+        verbose_name="病人id",
+    )
+    pay_type = models.ForeignKey(
+        PayType,
+        on_delete=models.DO_NOTHING,
+        related_name="records",
+        verbose_name="缴费项目id",
+    )
+
+    # 这两个字段都为空时表示还没有付款
+    receive = models.FloatField(null=True, blank=True, verbose_name="收款金额")
+    refund = models.FloatField(null=True, blank=True, verbose_name="找零")
+    method = models.IntegerField(
+        choices=PAY_METHOD, verbose_name="收款方式", default=0
+    )
+
+    creator = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name="created_pay_records",
+        verbose_name="创建者id",
+    )
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    modifier = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="modified_pay_records",
+        verbose_name="修改者id",
+    )
+    modify_time = models.DateTimeField(auto_now=True, verbose_name="修改时间")
+
+    class Meta:
+        verbose_name = "缴费记录"
+        verbose_name_plural = "缴费记录"
+        db_table = "pay_record"
+
+
 class PayItem(models.Model):
     record = models.ForeignKey(
         PayRecord,
@@ -66,12 +84,7 @@ class PayItem(models.Model):
         related_name="items",
         verbose_name="缴费单id",
     )
-    pay_type = models.ForeignKey(
-        PayType,
-        on_delete=models.DO_NOTHING,
-        related_name="items",
-        verbose_name="缴费项目id",
-    )
+    name = models.CharField(max_length=256, verbose_name="名称")
     # 数量、次数
     count = models.IntegerField(verbose_name="数量")
     price = models.FloatField(verbose_name="总价")

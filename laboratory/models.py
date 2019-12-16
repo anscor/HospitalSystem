@@ -38,6 +38,7 @@ class Laboratory(models.Model):
 
 class LaboratoryType(models.Model):
     name = models.CharField(max_length=256, verbose_name="类型名称")
+    price = models.FloatField(verbose_name="价格")
 
     class Meta:
         verbose_name = "化验类型"
