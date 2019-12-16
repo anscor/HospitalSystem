@@ -82,6 +82,16 @@ class Prescription(models.Model):
         verbose_name="医生id",
     )
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    # 可能不是医生
+    midifier = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="modifier_prescriptions",
+        verbose_name="修改者id",
+    )
+    modify_time = models.DateTimeField(auto_now=True, verbose_name="修改时间")
 
     class Meta:
         verbose_name = "处方"
