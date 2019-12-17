@@ -271,8 +271,13 @@ class ReservationViewSet(viewsets.ModelViewSet):
         if not ser.is_valid():
             print(ser.errors)
         item = ser.save()
-        
-        return return_success("预约成功！")
+
+        # 返回数据组装
+        data = ReservationSerializer(res).data
+        pay = PayRecordSerializer(res.pay).data
+        pay["items"] = PayItemSerializer(res.pay.items, many=True).data
+        data["pay"] = pay
+        return Response(data=data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         res = Reservation.objects.all().filter(id=self.kwargs.get("pk", 0))

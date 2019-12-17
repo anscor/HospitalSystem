@@ -264,24 +264,37 @@
 ```json
 [
     {
-        "id": 1,
+        "id": 19,
         "date": "2019-01-01",
-        "is_cancel": false,
-        "is_expert": true,
-        "patient": 14,	// 病人id
-        "department": 232,	// 预约科室，关联可预约科室id
-        "time": 2,	// 预约时间段，关联预约时间段id
-        "doctor": 19	// 预约医生id，关联专家医生用户id
-    },
-    {
-        "id": 2,
-        "date": "2019-01-01",
-        "is_cancel": false,
-        "is_expert": false,
+        "is_cancel": 0,
+        "is_paid": 0,
+        "is_finish": 0,
+        "is_expert": 1,
         "patient": 14,
         "department": 232,
+        "pay": {
+            "id": 6,
+            "receive": null,
+            "refund": null,
+            "method": 0,
+            "create_time": "2019-12-17T16:18:03.897531",
+            "modify_time": "2019-12-17T16:18:03.897531",
+            "patient": 14,
+            "pay_type": 2,
+            "creator": 14,
+            "modifier": null,
+            "items": [
+                {
+                    "id": 5,
+                    "name": "专家号费用",
+                    "count": 1,
+                    "price": 100,
+                    "record": 6
+                }
+            ]
+        },
         "time": 3,
-        "doctor": null
+        "doctor": 19
     },
     ...
 ]
@@ -307,7 +320,45 @@
 
 #### 返回参数
 
-##### 200 400 401 403
+##### 成功时 201
+
+```json
+{
+    "id": 19,
+    "date": "2019-01-01",
+    "is_cancel": 0,
+    "is_paid": 0,
+    "is_finish": 0,
+    "is_expert": 1,
+    "patient": 14,
+    "department": 232,
+    "pay": {
+        "id": 6,
+        "receive": null,
+        "refund": null,
+        "method": 0,
+        "create_time": "2019-12-17T16:18:03.897531",
+        "modify_time": "2019-12-17T16:18:03.897531",
+        "patient": 14,
+        "pay_type": 2,
+        "creator": 14,
+        "modifier": null,
+        "items": [
+            {
+                "id": 5,
+                "name": "专家号费用",
+                "count": 1,
+                "price": 100,
+                "record": 6
+            }
+        ]
+    },
+    "time": 3,
+    "doctor": 19
+}
+```
+
+##### 失败时 400 401 403
 
 ### 某条预约记录
 
@@ -323,13 +374,36 @@
 
 ```json
 {
-    "id": 1,
+    "id": 19,
     "date": "2019-01-01",
-    "is_cancel": false,
-    "is_expert": true,
+    "is_cancel": 0,
+    "is_paid": 0,
+    "is_finish": 0,
+    "is_expert": 1,
     "patient": 14,
     "department": 232,
-    "time": 2,
+    "pay": {
+        "id": 6,
+        "receive": null,
+        "refund": null,
+        "method": 0,
+        "create_time": "2019-12-17T16:18:03.897531",
+        "modify_time": "2019-12-17T16:18:03.897531",
+        "patient": 14,
+        "pay_type": 2,
+        "creator": 14,
+        "modifier": null,
+        "items": [
+            {
+                "id": 5,
+                "name": "专家号费用",
+                "count": 1,
+                "price": 100,
+                "record": 6
+            }
+        ]
+    },
+    "time": 3,
     "doctor": 19
 }
 ```
@@ -374,33 +448,9 @@
 
 #### 返回参数
 
-```json
-[
-    {
-        "id": 1,
-        "date": "2019-01-01",
-        "is_cancel": false,
-        "is_expert": true,
-        "patient": 14,
-        "department": 232,
-        "time": 2,
-        "doctor": 19
-    },
-    {
-        "id": 2,
-        "date": "2019-01-01",
-        "is_cancel": false,
-        "is_expert": false,
-        "patient": 14,
-        "department": 232,
-        "time": 3,
-        "doctor": null
-    },
-    ...
-]
-```
-
 ##### 成功时 200
+
+与**所有预约记录**返回参数格式相同。
 
 ##### 失败时 400 401 403 404
 
@@ -416,30 +466,6 @@
 
 ##### 成功时 200
 
-```json
-[
-    {
-        "id": 1,
-        "date": "2019-01-01",
-        "is_cancel": false,
-        "is_expert": true,
-        "patient": 14,
-        "department": 232,
-        "time": 2,
-        "doctor": 19
-    },
-    {
-        "id": 2,
-        "date": "2019-01-01",
-        "is_cancel": false,
-        "is_expert": false,
-        "patient": 14,
-        "department": 232,
-        "time": 3,
-        "doctor": null
-    },
-    ...
-]
-```
+与**所有预约记录**返回参数格式相同。
 
 ##### 失败时 400 401 403 404
