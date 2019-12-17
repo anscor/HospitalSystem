@@ -141,7 +141,7 @@ class PayRecordViewSet(viewsets.ModelViewSet):
             return return_success("创建成功！")
 
     def update(self, request, *args, **kwargs):
-        record = PayRecordSerializer.objects.all().filter(
+        record = PayRecord.objects.all().filter(
             id=self.kwargs.get("pk", 0)
         )
         if not record:

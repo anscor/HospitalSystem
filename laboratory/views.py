@@ -6,10 +6,12 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 
 from user.permissions import wrap_permission
-from user.views import (
+
+from common.return_template import (
+    return_create,
+    return_forbiden,
     return_not_find,
     return_param_error,
-    get_all_groups,
     return_success,
 )
 

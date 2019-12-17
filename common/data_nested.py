@@ -1,5 +1,5 @@
 def get_data_nested(
-    instance, serializer, sub_serializer, arrt_name, data_name, many=False
+    instance, serializer, sub_serializer, arrt_name="items", data_name="items", many=False, is_consist=True
 ):
     """
     组装items数据
@@ -13,5 +13,7 @@ def get_data_nested(
         data[data_name] = sub_serializer(
             getattr(instance, arrt_name), many=many
         ).data
+    elif is_consist:
+        data[data_name] = None
 
     return data
