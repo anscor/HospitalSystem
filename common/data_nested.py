@@ -10,6 +10,8 @@ def get_data_nested(
     data = serializer(instance).data
     sub = None
     if hasattr(instance, arrt_name):
-        sub = sub_serializer(getattr(instance, arrt_name), many=many).data
+        data[data_name] = sub_serializer(
+            getattr(instance, arrt_name), many=many
+        ).data
 
     return data
