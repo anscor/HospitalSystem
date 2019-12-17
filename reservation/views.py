@@ -80,13 +80,17 @@ class ReservationTimeViewSet(viewsets.ModelViewSet):
 
     @wrap_permission(permissions.AllowAny)
     def retrieve(self, request, *args, **kwargs):
-        time = ReservationTime.objects.all().filter(id=self.kwargs.get("pk", 0))
+        time = ReservationTime.objects.all().filter(
+            id=self.kwargs.get("pk", 0)
+        )
         if not time:
             return return_not_find("预约时间段不存在！")
         time = time[0]
 
         data = ReservationTimeSerializer(time).data
-        reserved_num = Reservation.objects.all().filter(time_id=time.id).count()
+        reserved_num = (
+            Reservation.objects.all().filter(time_id=time.id).count()
+        )
         data["reserved_num"] = reserved_num
         return Response(data=data, status=status.HTTP_200_OK)
 
@@ -203,7 +207,11 @@ class ReservationViewSet(viewsets.ModelViewSet):
         # 验证是不是已经有过预约
         if (
             Reservation.objects.all()
-            .filter(Q(patient_id=data.get("patient", 0)) & Q(time_id=time_id))
+            .filter(
+                Q(patient_id=data.get("patient", 0))
+                & Q(time_id=time_id)
+                & Q(date=date)
+            )
             .exists()
         ):
             return return_param_error("此时间段已经预约，不可重复预约！")
