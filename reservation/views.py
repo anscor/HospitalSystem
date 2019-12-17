@@ -13,6 +13,8 @@ from user.views import (
     return_param_error,
     return_success,
 )
+from finance.serializers import PayRecordSerializer, PayItemSerializer
+from finance.models import PayType
 
 from .models import *
 from .serializers import *
@@ -127,8 +129,15 @@ class ReservationViewSet(viewsets.ModelViewSet):
         ):
             return return_forbiden()
 
-        ser = ReservationSerializer(res)
-        return Response(data=ser.data, status=status.HTTP_200_OK)
+        if not res.pay_id:
+            return return_not_find("缴费记录不存在！")
+
+        data = ReservationSerializer(res).data
+        pay = PayRecordSerializer(res.pay)
+        pay_data = pay.data
+        pay_data["items"] = PayItemSerializer(res.pay.items, many=True).data
+        data["pay"] = pay_data
+        return Response(data=data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -232,7 +241,37 @@ class ReservationViewSet(viewsets.ModelViewSet):
         if not ser.is_valid():
             return return_param_error()
 
-        ser.save()
+        res = ser.save()
+
+        # 创建缴费记录
+        pte = PayType.objects.get(name="专家号费用")
+        ptn = PayType.objects.get(name="普通号费用")
+
+        data = {
+            "creator": request.user.id,
+            "patient": request.user.id,
+            "pay_type": pte.id if doctor_id else ptn.id
+        }
+
+        ser = PayRecordSerializer(data=data)
+        if not ser.is_valid():
+            print(ser.errors)
+        record = ser.save()
+
+        res.pay = record
+        res.save()
+
+        data = {
+            "name": pte.name if doctor_id else ptn.name,
+            "count": 1,
+            "price": pte.price if doctor_id else ptn.price,
+            "record": record.id
+        }
+        ser = PayItemSerializer(data=data)
+        if not ser.is_valid():
+            print(ser.errors)
+        item = ser.save()
+        
         return return_success("预约成功！")
 
     def update(self, request, *args, **kwargs):

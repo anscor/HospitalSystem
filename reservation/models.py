@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 
+from finance.models import PayRecord
+
 IS_NOT = ((0, "否"), (1, "是"))
 
 
@@ -32,6 +34,14 @@ class Reservation(models.Model):
         on_delete=models.DO_NOTHING,
         related_name="reservations",
         verbose_name="科室id",
+    )
+    pay = models.OneToOneField(
+        PayRecord,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="reservation",
+        verbose_name="缴费记录id",
     )
 
     # 哪一天去看病
