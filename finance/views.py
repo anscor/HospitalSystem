@@ -100,10 +100,6 @@ class PayRecordViewSet(viewsets.ModelViewSet):
             if not ser.is_valid():
                 return return_param_error()
             ser.save()
-
-            # 修改预约为已经缴费
-            obj.is_paid = True
-            obj.save()
             return return_success("创建成功！")
         else:
             # 如果对应处方、化验单没有对应的条目（不允许这种情况出现）
@@ -167,6 +163,9 @@ class PayRecordViewSet(viewsets.ModelViewSet):
             return return_param_error()
 
         ser.save()
+        if hasattr(record, "reservation"):
+            record.reservation.is_paid = True
+            record.reservation.save()
         return return_success("修改成功！")
 
     def list(self, request, *args, **kwargs):
