@@ -125,15 +125,15 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 
 | 请求方法 | 地址                                     | 说明                                   |
 | :------- | ---------------------------------------- | -------------------------------------- |
-| GET      | /api/laboratories/                       | 所有化验单                             |
-| POST     | /api/laboratories/                       | 添加化验单                             |
-| GET      | /api/laboratories/{pk}/                  | 某条化验单                             |
-| GET      | /api/users/{pk}/laboratories/            | 某个用户下的所有化验单                 |
+| GET      | /api/laboratories/                       | 所有化验单（完成）                     |
+| POST     | /api/laboratories/                       | 添加化验单（完成）                     |
+| GET      | /api/laboratories/{pk}/                  | 某条化验单（完成）                     |
+| GET      | /api/users/{pk}/laboratories/            | 某个用户下的所有化验单（完成）         |
 | GET      | /api/laboratory-types/                   | 所有化验类型（完成）                   |
 | POST     | /api/laboratory-types/                   | 添加化验类型（管理员可用）（完成）     |
 | GET      | /api/laboratory-types/{pk}/              | 某个化验类型（完成）                   |
 | DELETE   | /api/laboratory-types/{pk}/              | 删除某个化验类型（管理员可用）（完成） |
-| GET      | /api/laboratory-types/{pk}/laboratories/ | 某个化验类型下的所有化验单             |
+| GET      | /api/laboratory-types/{pk}/laboratories/ | 某个化验类型下的所有化验单（完成）     |
 
 ## 药房模块
 

@@ -16,6 +16,8 @@ from user.views import (
 from finance.serializers import PayRecordSerializer, PayItemSerializer
 from finance.models import PayType
 
+from common.data_nested import get_data_nested
+
 from .models import *
 from .serializers import *
 
@@ -113,7 +115,25 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     @wrap_permission(permissions.IsAdminUser)
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        ress = Reservation.objects.all()
+
+        data = []
+        for res in ress:
+            # 无效数据
+            if not res.pay:
+                continue
+            d = ReservationSerializer(res).data
+            d["pay"] = get_data_nested(
+                res.pay,
+                PayRecordSerializer,
+                PayItemSerializer,
+                "items",
+                "items",
+                True,
+            )
+            data.append(d)
+
+        return Response(data=data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, *args, **kwargs):
         res = Reservation.objects.all().filter(id=self.kwargs.get("pk", 0))
@@ -133,10 +153,14 @@ class ReservationViewSet(viewsets.ModelViewSet):
             return return_not_find("缴费记录不存在！")
 
         data = ReservationSerializer(res).data
-        pay = PayRecordSerializer(res.pay)
-        pay_data = pay.data
-        pay_data["items"] = PayItemSerializer(res.pay.items, many=True).data
-        data["pay"] = pay_data
+        data["pay"] = get_data_nested(
+            res.pay,
+            PayRecordSerializer,
+            PayItemSerializer,
+            "items",
+            "items",
+            True,
+        )
         return Response(data=data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
@@ -250,7 +274,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         data = {
             "creator": request.user.id,
             "patient": request.user.id,
-            "pay_type": pte.id if doctor_id else ptn.id
+            "pay_type": pte.id if doctor_id else ptn.id,
         }
 
         ser = PayRecordSerializer(data=data)
@@ -265,7 +289,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
             "name": pte.name if doctor_id else ptn.name,
             "count": 1,
             "price": pte.price if doctor_id else ptn.price,
-            "record": record.id
+            "record": record.id,
         }
         ser = PayItemSerializer(data=data)
         if not ser.is_valid():
@@ -294,11 +318,6 @@ class ReservationViewSet(viewsets.ModelViewSet):
             return return_forbiden()
 
         data = request.data
-        date = data.get("date", None)
-        doctor_id = data.get("doctor", res.doctor_id)
-        time_id = data.get("time", None)
-        patient_id = data.get("patient", res.patient_id)
-        department_id = data.get("department", res.department_id)
         is_cancel = data.get("is_cancel", None)
 
         # 取消预约
@@ -306,10 +325,6 @@ class ReservationViewSet(viewsets.ModelViewSet):
             res.is_cancel = 1
             res.save()
             return return_success("取消预约成功！")
-
-        if date:
-            date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-            data["date"] = date
         # TODO: 其他字段检测
         return return_success("更新预约成功！")
 

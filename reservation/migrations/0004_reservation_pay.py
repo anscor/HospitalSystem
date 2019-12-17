@@ -7,14 +7,21 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('finance', '0002_auto_20191216_1545'),
-        ('reservation', '0003_reservation_is_finish'),
+        ("finance", "0002_auto_20191216_1545"),
+        ("reservation", "0003_reservation_is_finish"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reservation',
-            name='pay',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='reservation', to='finance.PayRecord', verbose_name='缴费记录id'),
+            model_name="reservation",
+            name="pay",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="reservation",
+                to="finance.PayRecord",
+                verbose_name="缴费记录id",
+            ),
         ),
     ]

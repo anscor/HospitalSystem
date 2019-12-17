@@ -7,6 +7,16 @@ from rest_framework.response import Response
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.views import APIView
 
+from common.return_template import (
+    return_forbiden,
+    return_not_find,
+    return_param_error,
+    return_success,
+    return_create,
+)
+from common.groups import get_all_groups
+from common.data_nested import get_data_nested
+
 from user.permissions import wrap_permission
 from reservation.serializers import VisitSerializer, ReservationSerializer
 from reservation.models import Reservation
@@ -19,49 +29,6 @@ from laboratory.serializers import (
     LaboratoryItemSerializer,
     LaboratorySerializer,
 )
-
-
-def return_param_error(msg="请求参数出错！"):
-    return Response(data={"detail": msg}, status=status.HTTP_400_BAD_REQUEST)
-
-
-def return_not_find(msg):
-    return Response(data={"detail": msg}, status=status.HTTP_404_NOT_FOUND)
-
-
-def return_forbiden(msg="无权限！"):
-    return Response(data={"detail": msg}, status=status.HTTP_403_FORBIDDEN)
-
-
-def return_success(msg):
-    return Response(data={"detail": msg}, status=status.HTTP_200_OK)
-
-
-def get_all_groups(group, groups=None):
-    """
-    获取组的所有父组（包括自身）
-    """
-    if not group:
-        return None
-
-    ret = groups
-    if not groups:
-        ret = set()
-
-    if group not in ret:
-        ret.add(group)
-    else:
-        return ret
-
-    if not hasattr(group, "profile"):
-        return ret
-
-    pg = group.profile.parent_group
-    if not pg:
-        return ret
-
-    gs = get_all_groups(pg, ret)
-    return ret & gs
 
 
 class UserLogout(APIView):
@@ -116,7 +83,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 
         # 没有profile直接返回
         if not profile_data:
-            return return_success("创建组成功！")
+            return return_create(ser.data)
 
         profile_data["creator"] = request.user.id
         profile_data["group"] = group.id
@@ -126,8 +93,7 @@ class GroupViewSet(viewsets.ModelViewSet):
             return return_param_error()
 
         ser.save()
-
-        return return_success("创建组成功！")
+        return return_create(GroupSerializer(group).data)
 
     @wrap_permission(permissions.IsAdminUser)
     def update(self, request, *args, **kwargs):
@@ -595,7 +561,7 @@ class UserViewSet(viewsets.ModelViewSet):
         elif d in user.groups.all():
             if hasattr(user, "created_laboratories"):
                 las = user.created_laboratories.all()
-        
+
         if las:
             for la in las:
                 d = LaboratorySerializer(la).data

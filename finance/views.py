@@ -15,6 +15,8 @@ from user.views import (
 )
 from reservation.models import Reservation
 
+from common.data_nested import get_data_nested
+
 
 class PayTypeViewSet(viewsets.ModelViewSet):
     queryset = PayType.objects.all()
@@ -172,13 +174,33 @@ class PayRecordViewSet(viewsets.ModelViewSet):
 
         data = []
         for record in records:
-
-            pass
+            d = get_data_nested(
+                record,
+                PayRecordSerializer,
+                PayItemSerializer,
+                "items",
+                "items",
+                True,
+            )
+            data.append(d)
 
         return Response(data=data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
+        record = PayRecord.objects.all().filter(id=self.kwargs.get("pk", 0))
+        if not record:
+            return return_not_find("缴费记录不存在！")
+        record = record[0]
+
+        data = get_data_nested(
+            record,
+            PayRecordSerializer,
+            PayItemSerializer,
+            "items",
+            "items",
+            True,
+        )
+        return Response(data=data, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
         return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)
