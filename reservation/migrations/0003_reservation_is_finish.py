@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservation', '0002_reservation_is_paid'),
+        ("reservation", "0002_reservation_is_paid"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reservation',
-            name='is_finish',
-            field=models.BooleanField(choices=[(0, '否'), (1, '是')], default=0, verbose_name='是否已经到医院就诊'),
+            model_name="reservation",
+            name="is_finish",
+            field=models.BooleanField(
+                choices=[(0, "否"), (1, "是")],
+                default=0,
+                verbose_name="是否已经到医院就诊",
+            ),
         ),
     ]

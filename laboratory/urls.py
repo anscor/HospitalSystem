@@ -4,3 +4,4 @@ from .views import *
 
 router = routers.SimpleRouter()
 router.register("laboratory-types", LaboratoryTypeViewSet)
+router.register("laboratories", LaboratoryViewSet)

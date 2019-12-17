@@ -15,6 +15,10 @@ from outpatient.serializers import (
     PrescriptionItemSerializer,
     MedicalRecordSerializer,
 )
+from laboratory.serializers import (
+    LaboratoryItemSerializer,
+    LaboratorySerializer,
+)
 
 
 def return_param_error(msg="请求参数出错！"):
@@ -562,6 +566,44 @@ class UserViewSet(viewsets.ModelViewSet):
                 data = MedicalRecordSerializer(
                     user.created_medical_records, many=True
                 ).data
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @wrap_permission(permissions.IsAuthenticated)
+    @action(
+        methods=["GET"],
+        detail=True,
+        url_path="laboratories",
+        url_name="laboratories",
+    )
+    def get_laboratories(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+        user = User.objects.filter(id=pk)
+        if not user:
+            return return_not_find("用户不存在！")
+        user = user[0]
+
+        pg = Group.objects.get(name="病人")
+        d = Group.objects.get(name="医生")
+
+        data = []
+        las = None
+        if pg in user.groups.all():
+            if hasattr(user, "laboratories"):
+                las = user.laboratories.all()
+        elif d in user.groups.all():
+            if hasattr(user, "created_laboratories"):
+                las = user.created_laboratories.all()
+        
+        if las:
+            for la in las:
+                d = LaboratorySerializer(la).data
+                items = None
+                if hasattr(la, "items"):
+                    items = LaboratoryItemSerializer(la.items, many=True).data
+                d["items"] = items
+                data.append(d)
 
         return Response(data=data, status=status.HTTP_200_OK)
 

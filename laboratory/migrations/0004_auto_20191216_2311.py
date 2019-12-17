@@ -10,20 +10,30 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('laboratory', '0003_auto_20191216_2249'),
+        ("laboratory", "0003_auto_20191216_2249"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='laboratorytype',
-            name='create_time',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now, verbose_name='创建时间'),
+            model_name="laboratorytype",
+            name="create_time",
+            field=models.DateTimeField(
+                auto_now_add=True,
+                default=django.utils.timezone.now,
+                verbose_name="创建时间",
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='laboratorytype',
-            name='creator',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.DO_NOTHING, related_name='created_laboratory_types', to=settings.AUTH_USER_MODEL, verbose_name='创建者id'),
+            model_name="laboratorytype",
+            name="creator",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="created_laboratory_types",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="创建者id",
+            ),
             preserve_default=False,
         ),
     ]
