@@ -104,7 +104,7 @@ class RefundRecord(models.Model):
     )
 
     method = models.IntegerField(
-        choices=PAY_METHOD, verbose_name="退款方式", default=0
+        choices=PAY_METHOD, verbose_name="退款方式", default=1
     )
     refund = models.FloatField(verbose_name="退款金额")
     reason = models.CharField(

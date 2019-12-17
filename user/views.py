@@ -4,8 +4,9 @@ from .serializers import *
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.contrib.auth.models import AnonymousUser
 from rest_framework.views import APIView
+from django.contrib.auth.models import AnonymousUser
+from django.shortcuts import get_object_or_404
 
 from common.return_template import (
     return_forbiden,
@@ -65,11 +66,13 @@ class GroupViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         name = request.query_params.get("name", None)
         groups = Group.objects.all()
+        many = False
         if name:
             groups = groups.filter(name=name)
+            many = True
         if not groups:
             return return_not_find("没有相应的组！")
-        ser = GroupSerializer(groups, many=True)
+        ser = GroupSerializer(groups, many=many)
         return Response(data=ser.data, status=status.HTTP_200_OK)
 
     @wrap_permission(permissions.IsAdminUser)
@@ -130,7 +133,9 @@ class GroupViewSet(viewsets.ModelViewSet):
             profile_ser.save()
 
         group_ser.save()
-        return return_success("修改成功！")
+        return Response(
+            data=GroupSerializer(group).data, status=status.HTTP_200_OK
+        )
 
     def partial_update(self, request, *args, **kwargs):
         return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -146,7 +151,7 @@ class GroupViewSet(viewsets.ModelViewSet):
             profile.delete()
 
         group.delete()
-        return return_success("成功删除用户组！")
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_group_users(self, request, pk=None):
         if not pk:
@@ -263,7 +268,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         # 如果没有传profile则直接返回
         if not data:
-            return return_success("注册成功！")
+            return return_create(UserSerializer(user).data)
         # 创建对应profile
         data["user"] = user.id
         data["creator"] = (
@@ -278,7 +283,7 @@ class UserViewSet(viewsets.ModelViewSet):
             gs = get_all_groups(group)
             for g in gs:
                 user.groups.add(g)
-            return return_success("注册成功！")
+            return return_create(UserSerializer(user).data)
         else:
             # 如果profile创建失败，将原来已经添加的用户删除
             user.delete()
@@ -299,11 +304,9 @@ class UserViewSet(viewsets.ModelViewSet):
         ser = UserSerializer(user)
         return Response(ser.data, status=status.HTTP_200_OK)
 
-    @wrap_permission(permissions.IsAdminUser)
+    # @wrap_permission(permissions.IsAdminUser)
     def list(self, request, *args, **kwargs):
-        users = User.objects.all()
-        ser = UserSerializer(users, many=True)
-        return Response(data=ser.data, status=status.HTTP_200_OK)
+        return super().list(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         user = User.objects.all().filter(id=self.kwargs.get("pk", ""))
@@ -317,7 +320,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
         data = request.data
         data["username"] = ret.username
-        user_ser = UserSerializer(instance=ret, data=request.data, partial=True)
+        user_ser = UserSerializer(
+            instance=ret, data=request.data, partial=True
+        )
 
         if not user_ser.is_valid():
             return return_param_error()
@@ -343,7 +348,9 @@ class UserViewSet(viewsets.ModelViewSet):
             ser.save()
         user_ser.save()
 
-        return return_success("更改用户信息成功！")
+        return Response(
+            data=UserSerializer(user).data, status=status.HTTP_200_OK
+        )
 
     def partial_update(self, request, *args, **kwargs):
         return Response(data="", status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -361,7 +368,7 @@ class UserViewSet(viewsets.ModelViewSet):
             profile.delete()
 
         user.delete()
-        return return_success("成功删除用户！")
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_user_groups(self, request, pk=None):
         if not pk:
