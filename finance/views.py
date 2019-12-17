@@ -3,6 +3,7 @@ from .serializers import *
 
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from laboratory.models import Laboratory
 from outpatient.models import Prescription
@@ -25,15 +26,56 @@ class PayTypeViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         request.data["creator"] = request.user.id
+        request.data.pop("modifier", None)
         return super().create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
 
-        return super().update(request, *args, **kwargs)
+        ins = PayType.objects.all().filter(id=self.kwargs.get("pk", 0))
+        if not ins:
+            return return_param_error("缴费类型不存在！")
+        ins = ins[0]
+
+        data = request.data
+        data.pop("creator", None)
+        data.pop("creator", None)
+
+        data["modifier"] = request.user.id
+        ser = PayTypeSerializer(instance=ins, data=data, partial=True)
+        if not ser.is_valid():
+            print(ser.errors)
+            return return_param_error()
+        return return_success("修改成功！")
 
     @wrap_permission(permissions.IsAdminUser)
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
+
+    @action(
+        methods=["GET"],
+        detail=True,
+        url_name="pay-records",
+        url_path="pay-records",
+    )
+    def get_pay_records(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+
+        ins = PayType.objects.all().filter(id=pk)
+        if not ins:
+            return return_not_find("缴费类型不存在！")
+        ins = ins[0]
+
+        data = []
+        if hasattr(ins, "records"):
+            records = ins.records.all()
+            for rec in records:
+                data.append(
+                    get_data_nested(
+                        rec, PayRecordSerializer, PayItemSerializer, many=True
+                    )
+                )
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
 class PayRecordViewSet(viewsets.ModelViewSet):
@@ -137,9 +179,7 @@ class PayRecordViewSet(viewsets.ModelViewSet):
             return return_success("创建成功！")
 
     def update(self, request, *args, **kwargs):
-        record = PayRecord.objects.all().filter(
-            id=self.kwargs.get("pk", 0)
-        )
+        record = PayRecord.objects.all().filter(id=self.kwargs.get("pk", 0))
         if not record:
             return return_not_find("缴费记录不存在！")
         record = record[0]

@@ -14,6 +14,8 @@ from common.return_template import (
     return_param_error,
     return_success,
 )
+from common.data_nested import get_data_nested
+from common.groups import get_all_groups
 
 
 class LaboratoryTypeViewSet(viewsets.ModelViewSet):
@@ -47,12 +49,14 @@ class LaboratoryViewSet(viewsets.ModelViewSet):
         data = []
 
         for la in las:
-            d = LaboratorySerializer(la).data
-            items = None
-            if hasattr(la, "items"):
-                items = LaboratoryItemSerializer(la.items, many=True).data
-            d["items"] = items
-            data.append(d)
+            data.append(
+                get_data_nested(
+                    la,
+                    LaboratorySerializer,
+                    LaboratoryItemSerializer,
+                    many=True,
+                )
+            )
 
         return Response(data=data, status=status.HTTP_200_OK)
 
@@ -62,10 +66,9 @@ class LaboratoryViewSet(viewsets.ModelViewSet):
             return return_not_find("化验单不存在！")
         la = la[0]
 
-        data = LaboratorySerializer(la).data
-        if hasattr(la, "items"):
-            data["items"] = LaboratoryItemSerializer(la.items, many=True).data
-
+        data = get_data_nested(
+            la, LaboratorySerializer, LaboratoryItemSerializer, many=True,
+        )
         return Response(data=data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
