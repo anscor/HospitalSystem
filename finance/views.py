@@ -5,6 +5,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Q
+from django.contrib.auth.models import User, Group
 
 from laboratory.models import Laboratory
 from outpatient.models import Prescription
@@ -108,51 +109,42 @@ class PayRecordViewSet(viewsets.ModelViewSet):
         # 更改patient
         obj = None
         if pay_type.name == "化验单费用":
-            # 检查化验单是否存在
             obj = Laboratory.objects.all().filter(id=re_id)
-            if not obj:
-                return return_param_error()
-            if obj[0].pay:
-                return Response(
-                    get_data_nested(
-                        obj[0].pay,
-                        PayRecordSerializer,
-                        PayItemSerializer,
-                        many=True,
-                    )
-                )
-            data["patient"] = obj[0].patient_id
         elif pay_type.name == "处方签费用":
-            # 检查处方是否存在
             obj = Prescription.objects.all().filter(id=re_id)
-            if not obj:
-                return return_param_error()
-            if obj[0].pay:
+        else:
+            obj = User.objects.all().filter(id=re_id)
+
+        if not obj:
+            return return_param_error()
+        obj = obj[0]
+        if not isinstance(obj, User):
+            # 此单号已经缴费过了
+            if obj.pay:
                 return Response(
                     get_data_nested(
-                        obj[0].pay,
+                        obj.pay,
                         PayRecordSerializer,
                         PayItemSerializer,
                         many=True,
                     )
                 )
-            data["patient"] = obj[0].patient_id
-        # 预约费用
+            data["patient"] = obj.patient_id
         else:
-            # 检查预约是否存在
-            obj = Reservation.objects.all().filter(id=re_id)
-            if not obj:
-                return return_param_error()
-
-        obj = obj[0]
+            pg = Group.objects.get(name="病人")
+            if pg not in obj.groups.all():
+                return return_param_error("此用户不是病人！")
+            
+            data["patient"] = re_id
         # 创建记录
         ser = PayRecordSerializer(data=data)
         if not ser.is_valid():
+            print(ser.errors)
             return return_param_error()
         record = ser.save()
 
         # 创建对应item
-        if isinstance(obj, Reservation):
+        if isinstance(obj, User):
             data = {
                 "record": record.id,
                 "name": pay_type.name,
@@ -161,10 +153,10 @@ class PayRecordViewSet(viewsets.ModelViewSet):
             }
             ser = PayItemSerializer(data=data)
             if not ser.is_valid():
+                print(ser.errors)
                 return return_param_error()
             ser.save()
-            obj.pay = record
-            obj.save()
+
             return Response(
                 data=get_data_nested(
                     record, PayRecordSerializer, PayItemSerializer, many=True
