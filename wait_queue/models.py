@@ -2,12 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User, Group
 
 from reservation.models import Reservation
+from finance.models import PayRecord
 
 
 class WaitQueue(models.Model):
     patient = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
         related_name="wait_queues",
         verbose_name="病人id",
     )
@@ -15,7 +18,9 @@ class WaitQueue(models.Model):
     department = models.ForeignKey(
         Group,
         on_delete=models.DO_NOTHING,
-        related_name="wait_patients",
+        null=True,
+        blank=True,
+        related_name="wait_queues",
         verbose_name="科室id",
     )
 
@@ -24,8 +29,17 @@ class WaitQueue(models.Model):
         on_delete=models.DO_NOTHING,
         null=True,
         blank=True,
-        related_name="wait_patients",
+        related_name="doctor_wait_queues",
         verbose_name="医生id",
+    )
+
+    pay = models.OneToOneField(
+        PayRecord,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="wait_queue",
+        verbose_name="缴费id",
     )
 
     reservation = models.OneToOneField(
@@ -47,19 +61,12 @@ class WaitQueue(models.Model):
             return True
         elif not self.reservation and other.reservation:
             return False
-        # 没有预约时，比较到达时间，到达时间早的优先
-        elif not self.reservation and not other.reservation:
-            return self.joined_time < other.joined_time
-
-        # 都有预约
-        # 专家号优先
-        if self.reservation.is_expert and not other.reservation.is_expert:
-            return True
-        elif not self.reservation.is_expert and other.reservation.is_expert:
-            return False
-        # 都不是或者都是专家号时，比较到达时间，到达时间早的优先
+        # 都有或都没有预约时，比较到达时间，到达时间早的优先
         else:
             return self.joined_time < other.joined_time
+
+    def __eq__(self, other):
+        return self.patient == other.patient
 
     class Meta:
         managed = False

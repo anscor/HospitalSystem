@@ -1,5 +1,11 @@
 def get_data_nested(
-    instance, serializer, sub_serializer, arrt_name="items", data_name="items", many=False, is_consist=True
+    instance,
+    serializer,
+    sub_serializer,
+    arrt_name="items",
+    data_name="items",
+    many=False,
+    is_consist=True,
 ):
     """
     组装items数据

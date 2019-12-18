@@ -10,6 +10,7 @@ from medicine.urls import router as medicine_router
 from outpatient.urls import router as outpatient_router
 from reservation.urls import router as reservation_router
 from user.urls import router as user_router
+from wait_queue.urls import router as queue_router
 
 from user.views import UserGet, UserLogout, Department
 
@@ -21,6 +22,7 @@ router.registry.extend(medicine_router.registry)
 router.registry.extend(outpatient_router.registry)
 router.registry.extend(reservation_router.registry)
 router.registry.extend(user_router.registry)
+router.registry.extend(queue_router.registry)
 
 urlpatterns = [
     path("admin/", admin.site.urls),

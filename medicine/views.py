@@ -89,6 +89,10 @@ class MedicineViewSet(viewsets.ModelViewSet):
         data = request.data
         data["modifier"] = request.user.id
         ser = MedicineSerializer(instance=m, data=data, partial=True)
+        if not ser.is_valid():
+            print(ser.errors)
+            return return_param_error()
+        ser.save()
         return return_success("药物更新成功！")
 
     @wrap_permission(permissions.IsAdminUser)

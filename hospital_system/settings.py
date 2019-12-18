@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "user.apps.UserConfig",
     "laboratory.apps.LaboratoryConfig",
     "reservation.apps.ReservationConfig",
+    "wait_queue.apps.WaitQueueConfig",
 ]
 
 REST_FRAMEWORK = {
