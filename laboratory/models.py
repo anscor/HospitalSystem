@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 
+from finance.models import PayRecord
+
 
 class Laboratory(models.Model):
     patient = models.ForeignKey(
@@ -14,6 +16,15 @@ class Laboratory(models.Model):
         on_delete=models.DO_NOTHING,
         related_name="executed_laboratories",
         verbose_name="执行科室id",
+    )
+
+    pay = models.OneToOneField(
+        PayRecord,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="laboratory",
+        verbose_name="缴费记录id",
     )
 
     # 一般为医生

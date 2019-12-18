@@ -98,3 +98,16 @@ class MedicineViewSet(viewsets.ModelViewSet):
     @wrap_permission(permissions.IsAdminUser)
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
+
+
+class MedicineHandoutRecordViewSet(viewsets.ModelViewSet):
+    queryset = MedicineHandoutRecord.objects.all()
+    serializer_class = MedicineHandoutRecordSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+    
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    

@@ -2,6 +2,8 @@ from django.db import models
 
 from django.contrib.auth.models import User, Group
 
+from finance.models import PayRecord
+
 
 class MedicalRecord(models.Model):
     # 病人
@@ -68,6 +70,15 @@ class Prescription(models.Model):
         on_delete=models.DO_NOTHING,
         related_name="get_prescriptions",
         verbose_name="病人id",
+    )
+
+    pay = models.OneToOneField(
+        PayRecord,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="prescription",
+        verbose_name="缴费记录id",
     )
 
     IS_PAID = ((0, "未缴费"), (1, "已缴费"))

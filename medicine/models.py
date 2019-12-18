@@ -79,6 +79,8 @@ class MedicineHandoutRecord(models.Model):
         verbose_name="处方id",
     )
 
+    is_handout = models.BooleanField(verbose_name="是否已经发放", default=1)
+
     # 药房工作人员
     creator = models.ForeignKey(
         User,

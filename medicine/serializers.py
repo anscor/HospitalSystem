@@ -13,3 +13,9 @@ class MedicineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medicine
         fields = "__all__"
+
+
+class MedicineHandoutRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedicineHandoutRecord
+        fields = "__all___"

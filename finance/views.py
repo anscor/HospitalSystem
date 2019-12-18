@@ -112,12 +112,30 @@ class PayRecordViewSet(viewsets.ModelViewSet):
             obj = Laboratory.objects.all().filter(id=re_id)
             if not obj:
                 return return_param_error()
+            if obj[0].pay:
+                return Response(
+                    get_data_nested(
+                        obj[0].pay,
+                        PayRecordSerializer,
+                        PayItemSerializer,
+                        many=True,
+                    )
+                )
             data["patient"] = obj[0].patient_id
         elif pay_type.name == "处方签费用":
             # 检查处方是否存在
             obj = Prescription.objects.all().filter(id=re_id)
             if not obj:
                 return return_param_error()
+            if obj[0].pay:
+                return Response(
+                    get_data_nested(
+                        obj[0].pay,
+                        PayRecordSerializer,
+                        PayItemSerializer,
+                        many=True,
+                    )
+                )
             data["patient"] = obj[0].patient_id
         # 预约费用
         else:
@@ -145,6 +163,8 @@ class PayRecordViewSet(viewsets.ModelViewSet):
             if not ser.is_valid():
                 return return_param_error()
             ser.save()
+            obj.pay = record
+            obj.save()
             return Response(
                 data=get_data_nested(
                     record, PayRecordSerializer, PayItemSerializer, many=True
@@ -184,6 +204,8 @@ class PayRecordViewSet(viewsets.ModelViewSet):
                 print(ser.errors)
                 return return_param_error()
             ser.save()
+            obj.pay = record
+            obj.save()
             return Response(
                 data=get_data_nested(
                     record, PayRecordSerializer, PayItemSerializer, many=True
@@ -219,7 +241,12 @@ class PayRecordViewSet(viewsets.ModelViewSet):
         if hasattr(record, "reservation"):
             record.reservation.is_paid = True
             record.reservation.save()
-        return return_success("修改成功！")
+        return Response(
+            data=get_data_nested(
+                record, PayRecordSerializer, PayItemSerializer, many=True
+            ),
+            status=status.HTTP_200_OK,
+        )
 
     def list(self, request, *args, **kwargs):
         records = PayRecord.objects.all().filter(
