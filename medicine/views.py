@@ -153,11 +153,11 @@ class MedicineHandoutRecordViewSet(viewsets.ModelViewSet):
             return return_not_find("药物发放记录不存在！")
         mhr = mhr[0]
 
-        if mhr.is_handout:
-            return return_param_error("药物已发放，不可更改！")
+        # if mhr.handout_status:
+        #     return return_param_error("药物已发放，不可更改！")
 
-        data = {"is_handout": request.data.get("is_handout", None)}
-        if not data["is_handout"]:
+        data = {"handout_status": request.data.get("handout_status", None)}
+        if not data["handout_status"]:
             return return_param_error()
         data["modifier"] = request.user.id
         ser = MedicineHandoutRecordSerializer(
