@@ -79,7 +79,7 @@ class MedicineHandoutRecord(models.Model):
         verbose_name="处方id",
     )
 
-    is_handout = models.BooleanField(verbose_name="是否已经发放", default=0)
+    handout_status = models.IntegerField(verbose_name="药品发放状态", default=0)
 
     # 医生
     creator = models.ForeignKey(

@@ -187,8 +187,8 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 
 ## 分诊排队
 
-| 请求方法 | 地址                                              | 说明                   |
-| -------- | ------------------------------------------------- | ---------------------- |
-| POST     | /api/wait-queue/                                  | 将病人加入到排队队列中 |
-| GET      | /api/wait-queue/\[?top=]\[?doctor=][?department=] | 获取排队情况           |
+| 请求方法 | 地址                                              | 说明                           |
+| -------- | ------------------------------------------------- | ------------------------------ |
+| POST     | /api/wait-queue/                                  | 将病人加入到排队队列中（完成） |
+| GET      | /api/wait-queue/\[?top=]\[?doctor=][?department=] | 获取排队情况（完成）           |
 
