@@ -323,9 +323,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         data = request.data
         data["username"] = ret.username
-        user_ser = UserSerializer(
-            instance=ret, data=request.data, partial=True
-        )
+        user_ser = UserSerializer(instance=ret, data=request.data, partial=True)
 
         if not user_ser.is_valid():
             return return_param_error()

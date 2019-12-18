@@ -93,9 +93,7 @@ class WaitQueueViewSet(viewsets.ViewSet):
 
             data = {
                 "patient": reservation.patient.id,
-                "doctor": reservation.doctor.id
-                if reservation.doctor
-                else None,
+                "doctor": reservation.doctor.id if reservation.doctor else None,
                 "department": reservation.department.id,
                 "pay": reservation.pay.id,
                 "reservation": reservation.id,
@@ -187,7 +185,7 @@ class WaitQueueViewSet(viewsets.ViewSet):
 
         if all((doctor_id, department_id)):
             return return_param_error("医生与科室不能同时指定！")
-        
+
         if top and not doctor_id and not department_id:
             return return_param_error("指定top时必须指定doctor或department！")
 
@@ -234,5 +232,5 @@ class WaitQueueViewSet(viewsets.ViewSet):
                     data["department"][department_id].append(
                         UserSerializer(p.patient).data
                     )
-        
+
         return Response(data=data, status=status.HTTP_200_OK)

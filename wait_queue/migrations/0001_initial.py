@@ -10,28 +10,91 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('reservation', '0004_reservation_pay'),
-        ('finance', '0003_auto_20191218_1332'),
+        ("reservation", "0004_reservation_pay"),
+        ("finance", "0003_auto_20191218_1332"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('auth', '0011_update_proxy_permissions'),
+        ("auth", "0011_update_proxy_permissions"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='WaitQueue',
+            name="WaitQueue",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('joined_time', models.DateTimeField(auto_now_add=True, verbose_name='开始排队时间')),
-                ('department', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='wait_queues', to='auth.Group', verbose_name='科室id')),
-                ('doctor', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='doctor_wait_queues', to=settings.AUTH_USER_MODEL, verbose_name='医生id')),
-                ('patient', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='wait_queues', to=settings.AUTH_USER_MODEL, verbose_name='病人id')),
-                ('pay', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='wait_queue', to='finance.PayRecord', verbose_name='缴费id')),
-                ('reservation', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='wait_queue', to='reservation.Reservation', verbose_name='预约id')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "joined_time",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="开始排队时间"
+                    ),
+                ),
+                (
+                    "department",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="wait_queues",
+                        to="auth.Group",
+                        verbose_name="科室id",
+                    ),
+                ),
+                (
+                    "doctor",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="doctor_wait_queues",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="医生id",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="wait_queues",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="病人id",
+                    ),
+                ),
+                (
+                    "pay",
+                    models.OneToOneField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="wait_queue",
+                        to="finance.PayRecord",
+                        verbose_name="缴费id",
+                    ),
+                ),
+                (
+                    "reservation",
+                    models.OneToOneField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="wait_queue",
+                        to="reservation.Reservation",
+                        verbose_name="预约id",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '就诊等待队列',
-                'verbose_name_plural': '就诊等待队列',
-                'db_table': 'wait_queue',
+                "verbose_name": "就诊等待队列",
+                "verbose_name_plural": "就诊等待队列",
+                "db_table": "wait_queue",
             },
         ),
     ]

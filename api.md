@@ -157,9 +157,9 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 | GET      | /api/medicine/{pk}/                 | 某种药物（完成）                       |
 | PUT      | /api/medicine/{pk}/                 | 修改某种药物（完成）                   |
 | DELETE   | /api/medicine/{pk}/                 | 删除某种药物（管理员可用）（完成）     |
-| GET      | /api/medicine-handout-records/      | 所有药物发放记录                       |
-| POST     | /api/medicine-handout-records/      | 添加药物发放记录                       |
-| GET      | /api/medicine-handout-records/{pk}/ | 某条药物发放记录                       |
+| GET      | /api/medicine-handout-records/      | 所有药物发放记录（完成）               |
+| GET      | /api/medicine-handout-records/{pk}/ | 某条药物发放记录（完成）               |
+| PUT      | /api/medicine-handout-records/{pk}/ | 更新某条药物发放记录（完成）           |
 
 ## 预约模块
 

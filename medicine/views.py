@@ -12,6 +12,12 @@ from user.views import (
     return_not_find,
     return_param_error,
 )
+from outpatient.serializers import (
+    PrescriptionSerializer,
+    PrescriptionItemSerializer,
+)
+
+from common.data_nested import get_data_nested
 
 
 class MedicineTypeViewSet(viewsets.ModelViewSet):
@@ -106,8 +112,79 @@ class MedicineHandoutRecordViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-    
+        pass
+
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-    
+        mhrs = MedicineHandoutRecord.objects.all()
+        data = []
+        for mhr in mhrs:
+            d = MedicineHandoutRecordSerializer(mhr).data
+            d["prescription"] = get_data_nested(
+                mhr.prescription,
+                PrescriptionSerializer,
+                PrescriptionItemSerializer,
+                many=True,
+            )
+            data.append(d)
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        mhr = MedicineHandoutRecord.objects.all().filter(
+            id=self.kwargs.get("pk", 0)
+        )
+        if not mhr:
+            return return_not_find("药物发放记录不存在！")
+        mhr = mhr[0]
+
+        data = MedicineHandoutRecordSerializer(mhr).data
+        data["prescription"] = get_data_nested(
+            mhr.prescription,
+            PrescriptionSerializer,
+            PrescriptionItemSerializer,
+            many=True,
+        )
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        mhr = MedicineHandoutRecord.objects.all().filter(
+            id=self.kwargs.get("pk", 0)
+        )
+        if not mhr:
+            return return_not_find("药物发放记录不存在！")
+        mhr = mhr[0]
+
+        if mhr.is_handout:
+            return return_param_error("药物已发放，不可更改！")
+
+        data = {"is_handout": request.data.get("is_handout", None)}
+        if not data["is_handout"]:
+            return return_param_error()
+        data["modifier"] = request.user.id
+        ser = MedicineHandoutRecordSerializer(
+            instance=mhr, data=data, partial=True
+        )
+        if not ser.is_valid():
+            print(ser.errors)
+            return return_param_error()
+        mhr = ser.save()
+
+        # 更改药物库存
+        for item in mhr.prescription.items.all():
+            item.medicine.count -= item.count
+            item.medicine.modifier = request.user
+            item.medicine.save()
+
+        data = MedicineHandoutRecordSerializer(mhr).data
+        data["prescription"] = get_data_nested(
+            mhr.prescription,
+            PrescriptionSerializer,
+            PrescriptionItemSerializer,
+            many=True,
+        )
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    def partial_update(self, request, *args, **kwargs):
+        pass
+
+    def destroy(self, request, *args, **kwargs):
+        pass

@@ -247,3 +247,203 @@
 ##### 204 401 403 404
 
 ## 药物发放相关
+
+### 所有药物发放记录
+
+**GET** /api/medicine-handout-records/
+
+#### 返回参数
+
+##### 成功时 200
+
+```json
+[
+    {
+        "id": 3,
+        "is_handout": false,	// 药物是否已经发放了
+        "create_time": "2019-12-18T20:14:25.053914",
+        "modify_time": "2019-12-18T20:19:21.570939",
+        "prescription": {
+            "id": 5,
+            "is_paid": false,
+            "create_time": "2019-12-18T20:14:24.483916",
+            "modify_time": "2019-12-18T20:14:24.484917",
+            "patient": 14,
+            "pay": null,
+            "creator": 19,
+            "midifier": null,
+            "items": [
+                {
+                    "id": 8,
+                    "method": "药物用法",
+                    "ratio": "3次/天",
+                    "days": 7,
+                    "commet": "其他注意事项",
+                    "count": 10,
+                    "count_unit": "总量单位",
+                    "dosage": "1/3",
+                    "dosage_unit": "用量单位",
+                    "skin_test": null,
+                    "prescription": 5,
+                    "medicine": 1
+                },
+                {
+                    "id": 9,
+                    "method": "药物用法",
+                    "ratio": "3次/天",
+                    "days": 7,
+                    "commet": "其他注意事项",
+                    "count": 10,
+                    "count_unit": "总量单位",
+                    "dosage": "1/3",
+                    "dosage_unit": "用量单位",
+                    "skin_test": null,
+                    "prescription": 5,
+                    "medicine": 2
+                }
+            ]
+        },
+        "creator": 19,
+        "modifier": null
+    },
+    ...
+]
+```
+
+##### 失败时 401
+
+### 某条药物发放记录
+
+**GET** /api/medicine-handout-records/{pk}/
+
+#### 请求参数
+
+- pk：药物发放记录id。
+
+#### 返回参数
+
+##### 成功时 200
+
+```json
+{
+    "id": 3,
+    "is_handout": false,	// 药物是否已经发放了
+    "create_time": "2019-12-18T20:14:25.053914",
+    "modify_time": "2019-12-18T20:19:21.570939",
+    "prescription": {
+        "id": 5,
+        "is_paid": false,
+        "create_time": "2019-12-18T20:14:24.483916",
+        "modify_time": "2019-12-18T20:14:24.484917",
+        "patient": 14,
+        "pay": null,
+        "creator": 19,
+        "midifier": null,
+        "items": [
+            {
+                "id": 8,
+                "method": "药物用法",
+                "ratio": "3次/天",
+                "days": 7,
+                "commet": "其他注意事项",
+                "count": 10,
+                "count_unit": "总量单位",
+                "dosage": "1/3",
+                "dosage_unit": "用量单位",
+                "skin_test": null,
+                "prescription": 5,
+                "medicine": 1
+            },
+            {
+                "id": 9,
+                "method": "药物用法",
+                "ratio": "3次/天",
+                "days": 7,
+                "commet": "其他注意事项",
+                "count": 10,
+                "count_unit": "总量单位",
+                "dosage": "1/3",
+                "dosage_unit": "用量单位",
+                "skin_test": null,
+                "prescription": 5,
+                "medicine": 2
+            }
+        ]
+    },
+    "creator": 19,
+    "modifier": null
+}
+```
+
+##### 失败时 401 404
+
+### 更新某条药物发放记录
+
+**PUT** /api/medicine-handout-records/{pk}/
+
+#### 请求参数
+
+- pk：药物发放记录id。
+
+```json
+{
+	"is_handout": 1
+}
+```
+
+#### 返回参数
+
+##### 成功时 200
+
+```json
+{
+    "id": 3,
+    "is_handout": true,	// 药物是否已经发放了
+    "create_time": "2019-12-18T20:14:25.053914",
+    "modify_time": "2019-12-18T20:19:21.570939",
+    "prescription": {
+        "id": 5,
+        "is_paid": false,
+        "create_time": "2019-12-18T20:14:24.483916",
+        "modify_time": "2019-12-18T20:14:24.484917",
+        "patient": 14,
+        "pay": null,
+        "creator": 19,
+        "midifier": null,
+        "items": [
+            {
+                "id": 8,
+                "method": "药物用法",
+                "ratio": "3次/天",
+                "days": 7,
+                "commet": "其他注意事项",
+                "count": 10,
+                "count_unit": "总量单位",
+                "dosage": "1/3",
+                "dosage_unit": "用量单位",
+                "skin_test": null,
+                "prescription": 5,
+                "medicine": 1
+            },
+            {
+                "id": 9,
+                "method": "药物用法",
+                "ratio": "3次/天",
+                "days": 7,
+                "commet": "其他注意事项",
+                "count": 10,
+                "count_unit": "总量单位",
+                "dosage": "1/3",
+                "dosage_unit": "用量单位",
+                "skin_test": null,
+                "prescription": 5,
+                "medicine": 2
+            }
+        ]
+    },
+    "creator": 19,
+    "modifier": null
+}
+```
+
+##### 失败时 400 401 404

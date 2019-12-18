@@ -4,12 +4,13 @@ from .serializers import *
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 
-from user.views import (
+from common.return_template import (
     return_param_error,
     return_not_find,
     return_success,
-    get_all_groups,
 )
+from common.groups import get_all_groups
+from medicine.serializers import MedicineHandoutRecordSerializer
 
 import datetime
 
@@ -58,6 +59,16 @@ class PrescriptionViewSet(viewsets.ModelViewSet):
             print(ser.errors)
             return return_param_error()
         ser.save()
+
+        # 创建药单
+        data = {"creator": request.user.id, "prescription": pre.id}
+
+        ser = MedicineHandoutRecordSerializer(data=data)
+        if not ser.is_valid():
+            print(ser.errors)
+            return return_param_error()
+        ser.save()
+
         return return_success("创建成功！")
 
     def list(self, request, *args, **kwargs):

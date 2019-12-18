@@ -79,9 +79,9 @@ class MedicineHandoutRecord(models.Model):
         verbose_name="处方id",
     )
 
-    is_handout = models.BooleanField(verbose_name="是否已经发放", default=1)
+    is_handout = models.BooleanField(verbose_name="是否已经发放", default=0)
 
-    # 药房工作人员
+    # 医生
     creator = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
@@ -89,6 +89,17 @@ class MedicineHandoutRecord(models.Model):
         verbose_name="创建者id",
     )
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+    # 药房工作人员
+    modifier = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="modified_medicine_handout_records",
+        verbose_name="修改者id",
+    )
+    modify_time = models.DateTimeField(auto_now=True, verbose_name="修改时间")
 
     class Meta:
         verbose_name = "药物发放记录"

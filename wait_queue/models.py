@@ -51,9 +51,7 @@ class WaitQueue(models.Model):
         verbose_name="预约id",
     )
 
-    joined_time = models.DateTimeField(
-        auto_now_add=True, verbose_name="开始排队时间"
-    )
+    joined_time = models.DateTimeField(auto_now_add=True, verbose_name="开始排队时间")
 
     def __lt__(self, other):
         # 有预约优先

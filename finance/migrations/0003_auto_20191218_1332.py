@@ -6,13 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('finance', '0002_auto_20191216_1545'),
+        ("finance", "0002_auto_20191216_1545"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='refundrecord',
-            name='method',
-            field=models.IntegerField(choices=[(0, '未付款'), (1, '现金'), (2, '银联'), (3, '支付宝'), (4, '微信')], default=1, verbose_name='退款方式'),
+            model_name="refundrecord",
+            name="method",
+            field=models.IntegerField(
+                choices=[
+                    (0, "未付款"),
+                    (1, "现金"),
+                    (2, "银联"),
+                    (3, "支付宝"),
+                    (4, "微信"),
+                ],
+                default=1,
+                verbose_name="退款方式",
+            ),
         ),
     ]

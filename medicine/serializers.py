@@ -18,4 +18,4 @@ class MedicineSerializer(serializers.ModelSerializer):
 class MedicineHandoutRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = MedicineHandoutRecord
-        fields = "__all___"
+        fields = "__all__"
