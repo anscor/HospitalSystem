@@ -13,6 +13,7 @@ from user.permissions import wrap_permission
 
 from common.return_template import return_param_error, return_success
 from common.groups import get_all_groups
+from common.data_nested import get_data_nested
 
 import datetime
 import bisect
@@ -180,8 +181,8 @@ class WaitQueueViewSet(viewsets.ViewSet):
         department_id = request.query_params.get("department", None)
         top = request.query_params.get("top", None)
 
-        if top and top != 1:
-            return return_param_error("top指定1！")
+        if top and top != 1 and top != "1":
+            return return_param_error("top只能指定1！")
 
         if all((doctor_id, department_id)):
             return return_param_error("医生与科室不能同时指定！")
@@ -205,7 +206,6 @@ class WaitQueueViewSet(viewsets.ViewSet):
                 for p in wait_queues["doctor"][doctor_id]:
                     if top:
                         data = UserSerializer(p.patient).data
-                        data["doctor"][doctor_id].pop(0)
                         p.delete()
                         break
                     data["doctor"][doctor_id].append(
@@ -220,17 +220,36 @@ class WaitQueueViewSet(viewsets.ViewSet):
 
             if dg not in get_all_groups(department):
                 return return_param_error("必须指定科室！")
-
+            
+            department_id = int(department_id)
             data["department"] = {department_id: []}
             if department_id in wait_queues["department"].keys():
                 for p in wait_queues["department"][department_id]:
                     if top:
                         data = UserSerializer(p.patient).data
-                        data["department"][department_id].pop(0)
                         p.delete()
                         break
                     data["department"][department_id].append(
                         UserSerializer(p.patient).data
                     )
+        
+        # 两者都未指定时，返回全部排队信息
+        if not doctor_id and not department_id:
+            data = {"doctor": {}, "department": {}}
+            doctor = {}
+            department = {}
+
+            for key in wait_queues["doctor"]:
+                doctor[key] = []
+                for d in wait_queues["doctor"][key]:
+                    doctor[key].append(UserSerializer(d.patient).data)
+            
+            for key in wait_queues["department"]:
+                department[key] = []
+                for d in wait_queues["department"][key]:
+                    department[key].append(UserSerializer(d.patient).data)
+            
+            data["doctor"] = doctor
+            data["department"] = department
 
         return Response(data=data, status=status.HTTP_200_OK)
