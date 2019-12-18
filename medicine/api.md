@@ -260,7 +260,7 @@
 [
     {
         "id": 3,
-        "is_handout": false,	// 药物是否已经发放了
+        "handout_status": false,	// 药物是否已经发放了
         "create_time": "2019-12-18T20:14:25.053914",
         "modify_time": "2019-12-18T20:19:21.570939",
         "prescription": {
@@ -327,7 +327,7 @@
 ```json
 {
     "id": 3,
-    "is_handout": false,	// 药物是否已经发放了
+    "handout_status": false,	// 药物是否已经发放了
     "create_time": "2019-12-18T20:14:25.053914",
     "modify_time": "2019-12-18T20:19:21.570939",
     "prescription": {
@@ -387,7 +387,7 @@
 
 ```json
 {
-	"is_handout": 1
+	"handout_status": 1
 }
 ```
 
@@ -398,7 +398,7 @@
 ```json
 {
     "id": 3,
-    "is_handout": true,	// 药物是否已经发放了
+    "handout_status": true,	// 药物是否已经发放了
     "create_time": "2019-12-18T20:14:25.053914",
     "modify_time": "2019-12-18T20:19:21.570939",
     "prescription": {
