@@ -21,5 +21,6 @@ def return_success(msg):
 def return_create(data):
     return Response(data=data, status=status.HTTP_201_CREATED)
 
+
 def return_not_allow(data=None):
     return Response(data=data, status=status.HTTP_405_METHOD_NOT_ALLOWED)

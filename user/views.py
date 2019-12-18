@@ -32,7 +32,12 @@ from laboratory.serializers import (
     LaboratorySerializer,
 )
 
-from finance.serializers import PayRecordSerializer, PayItemSerializer
+from finance.serializers import (
+    PayRecordSerializer,
+    PayItemSerializer,
+    RefundRecordSerializer,
+    RefundRecordItemSerializer,
+)
 
 
 class UserLogout(APIView):
@@ -616,6 +621,39 @@ class UserViewSet(viewsets.ModelViewSet):
                 data.append(
                     get_data_nested(
                         pr, PayRecordSerializer, PayItemSerializer, many=True
+                    )
+                )
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @wrap_permission(permissions.IsAuthenticated)
+    @action(
+        methods=["GET"],
+        detail=True,
+        url_path="refund-records",
+        url_name="refund-records",
+    )
+    def get_refund_records(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+        user = User.objects.filter(id=pk)
+        if not user:
+            return return_not_find("用户不存在！")
+        user = user[0]
+
+        data = []
+        inss = None
+        if hasattr(user, "created_refund_records"):
+            inss = user.created_refund_records.all()
+
+        if inss:
+            for ins in inss:
+                data.append(
+                    get_data_nested(
+                        ins,
+                        RefundRecordSerializer,
+                        RefundRecordItemSerializer,
+                        many=True,
                     )
                 )
 

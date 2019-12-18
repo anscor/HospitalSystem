@@ -7,14 +7,20 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('finance', '0004_auto_20191218_2302'),
+        ("finance", "0004_auto_20191218_2302"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='refundrecorditem',
-            name='record',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.DO_NOTHING, related_name='items', to='finance.RefundRecord', verbose_name='退款记录id'),
+            model_name="refundrecorditem",
+            name="record",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="items",
+                to="finance.RefundRecord",
+                verbose_name="退款记录id",
+            ),
             preserve_default=False,
         ),
     ]

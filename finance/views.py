@@ -421,7 +421,7 @@ class AuditRecordViewSet(viewsets.ModelViewSet):
             data["result"] = 1
         data["auditor"] = request.user.id
 
-        ser = AuditRecordSerializer(instance=ins, data = data, partial=True)
+        ser = AuditRecordSerializer(instance=ins, data=data, partial=True)
         if not ser.is_valid():
             print(ser.errors)
             return return_param_error()
