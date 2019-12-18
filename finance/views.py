@@ -262,9 +262,9 @@ class PayRecordViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         record = PayRecord.objects.all().filter(id=self.kwargs.get("pk", 0))
-        record = record.filter(
-            Q(receive__isnull=False) & Q(refund__isnull=False)
-        )
+        # record = record.filter(
+        #     Q(receive__isnull=False) & Q(refund__isnull=False)
+        # )
         if not record:
             return return_not_find("缴费记录不存在！")
         record = record[0]
