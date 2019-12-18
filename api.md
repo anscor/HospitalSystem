@@ -184,3 +184,12 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 | PUT      | /api/visits/{pk}/                        | 更新某个坐诊时间记录（专家医生可用）（完成）           |
 | DELETE   | /api/visits/{pk}/                        | 删除某个坐诊时间记录（专家医生可用）（完成）           |
 | GET      | /api/users/{pk}/visits/                  | 某个用户下的所有坐诊时间记录（完成）                   |
+
+## 分诊排队
+
+| 请求方法 | 地址                                              | 说明                     |
+| -------- | ------------------------------------------------- | ------------------------ |
+| POST     | /api/wait-queue/                                  | 将病人加入到排队队列中   |
+| GET      | /api/wait-queue/\[?top=]\[?doctor=][?department=] | 获取排队情况             |
+| DELETE   | /api/wait-queue/\[?doctor=][?department=]         | 删除指定队列中第一个病人 |
+

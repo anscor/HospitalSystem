@@ -4,10 +4,12 @@ from wait_queue.serializers import WaitQueueSerializer
 from django.contrib.auth.models import Group, User
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from reservation.models import Reservation
 from finance.models import PayRecord
 from user.serializers import UserSerializer
+from user.permissions import wrap_permission
 
 from common.return_template import return_param_error, return_success
 from common.groups import get_all_groups
@@ -19,7 +21,8 @@ import bisect
 wait_queues = {"doctor": {}, "department": {}}
 
 
-class WaitQueueViewSet(viewsets.ModelViewSet):
+class WaitQueueViewSet(viewsets.ViewSet):
+
     queryset = WaitQueue.objects.all()
     serializer_class = WaitQueueSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -43,15 +46,6 @@ class WaitQueueViewSet(viewsets.ModelViewSet):
             )
 
         return True
-
-    def destroy(self, request, *args, **kwargs):
-        pass
-
-    def update(self, request, *args, **kwargs):
-        pass
-
-    def partial_update(self, request, *args, **kwargs):
-        pass
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -167,9 +161,6 @@ class WaitQueueViewSet(viewsets.ModelViewSet):
         else:
             return return_param_error("已经在排队中，不能重复添加！")
 
-    def retrieve(self, request, *args, **kwargs):
-        pass
-
     def list(self, request, *args, **kwargs):
         pg = Group.objects.get(name="病人")
         edg = Group.objects.get(name="专家医生")
@@ -178,9 +169,16 @@ class WaitQueueViewSet(viewsets.ModelViewSet):
 
         doctor_id = request.query_params.get("doctor", None)
         department_id = request.query_params.get("department", None)
+        top = request.query_params.get("top", None)
+
+        if top and top != 1:
+            return return_param_error("top指定1！")
 
         if all((doctor_id, department_id)):
             return return_param_error("医生与科室不能同时指定！")
+        
+        if top and not doctor_id and not department_id:
+            return return_param_error("指定top时必须指定doctor或department！")
 
         data = {}
         if doctor_id:
@@ -195,6 +193,10 @@ class WaitQueueViewSet(viewsets.ModelViewSet):
             data["doctor"] = {doctor_id: []}
             if doctor_id in wait_queues["doctor"].keys():
                 for p in wait_queues["doctor"][doctor_id]:
+                    if top:
+                        data = UserSerializer(p.patient).data
+                        data["doctor"][doctor_id].pop(0)
+                        break
                     data["doctor"][doctor_id].append(
                         UserSerializer(p.patient).data
                     )
@@ -209,9 +211,12 @@ class WaitQueueViewSet(viewsets.ModelViewSet):
                 return return_param_error("必须指定科室！")
 
             data["department"] = {department_id: []}
-
             if department_id in wait_queues["department"].keys():
                 for p in wait_queues["department"][department_id]:
+                    if top:
+                        data = UserSerializer(p.patient).data
+                        data["department"][department_id].pop(0)
+                        break
                     data["department"][department_id].append(
                         UserSerializer(p.patient).data
                     )

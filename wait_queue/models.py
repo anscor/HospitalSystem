@@ -69,5 +69,6 @@ class WaitQueue(models.Model):
         return self.patient == other.patient
 
     class Meta:
-        managed = False
+        verbose_name = "就诊等待队列"
+        verbose_name_plural = "就诊等待队列"
         db_table = "wait_queue"
