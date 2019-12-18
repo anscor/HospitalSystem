@@ -220,7 +220,7 @@ class WaitQueueViewSet(viewsets.ViewSet):
 
             if dg not in get_all_groups(department):
                 return return_param_error("必须指定科室！")
-            
+
             department_id = int(department_id)
             data["department"] = {department_id: []}
             if department_id in wait_queues["department"].keys():
@@ -232,7 +232,7 @@ class WaitQueueViewSet(viewsets.ViewSet):
                     data["department"][department_id].append(
                         UserSerializer(p.patient).data
                     )
-        
+
         # 两者都未指定时，返回全部排队信息
         if not doctor_id and not department_id:
             data = {"doctor": {}, "department": {}}
@@ -243,12 +243,12 @@ class WaitQueueViewSet(viewsets.ViewSet):
                 doctor[key] = []
                 for d in wait_queues["doctor"][key]:
                     doctor[key].append(UserSerializer(d.patient).data)
-            
+
             for key in wait_queues["department"]:
                 department[key] = []
                 for d in wait_queues["department"][key]:
                     department[key].append(UserSerializer(d.patient).data)
-            
+
             data["doctor"] = doctor
             data["department"] = department
 

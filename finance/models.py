@@ -96,11 +96,11 @@ class PayItem(models.Model):
 
 
 class RefundRecord(models.Model):
-    item = models.ForeignKey(
-        PayItem,
+    pay = models.ForeignKey(
+        PayRecord,
         on_delete=models.DO_NOTHING,
         related_name="refunds",
-        verbose_name="项目id",
+        verbose_name="缴费单id",
     )
 
     method = models.IntegerField(
@@ -125,12 +125,35 @@ class RefundRecord(models.Model):
         db_table = "refund_record"
 
 
+class RefundRecordItem(models.Model):
+    record = models.ForeignKey(
+        RefundRecord,
+        on_delete=models.DO_NOTHING,
+        related_name="items",
+        verbose_name="退款记录id",
+    )
+
+    item = models.ForeignKey(
+        PayItem,
+        on_delete=models.DO_NOTHING,
+        related_name="refund_items",
+        verbose_name="缴费项目id",
+    )
+
+    refund = models.FloatField(verbose_name="退款金额")
+
+    class Meta:
+        verbose_name = "退款记录条目"
+        verbose_name_plural = "退款记录条目"
+        db_table = "refund_record_item"
+
+
 class AuditRecord(models.Model):
 
-    AUDIT_RESULT = ((0, "通过"), (1, "未通过"))
+    AUDIT_RESULT = ((1, "通过"), (0, "未通过"))
 
     result = models.IntegerField(
-        choices=AUDIT_RESULT, verbose_name="审核结果", default=0
+        choices=AUDIT_RESULT, verbose_name="审核结果", null=True, blank=True
     )
     # 如未通过填写原因
     commet = models.CharField(
@@ -147,10 +170,12 @@ class AuditRecord(models.Model):
     auditor = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
         related_name="audited_records",
         verbose_name="审核者id",
     )
-    audit_time = models.DateTimeField(auto_now_add=True, verbose_name="审核时间")
+    audit_time = models.DateTimeField(auto_now=True, verbose_name="审核时间")
 
     class Meta:
         verbose_name = "结算审核记录"
@@ -168,12 +193,16 @@ class AuditItem(models.Model):
     receive = models.ForeignKey(
         PayRecord,
         on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
         related_name="audit_items",
         verbose_name="收款条目id",
     )
     refund = models.ForeignKey(
         RefundRecord,
         on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
         related_name="audit_items",
         verbose_name="退款条目",
     )

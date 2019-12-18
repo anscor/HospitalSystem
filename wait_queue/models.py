@@ -65,7 +65,7 @@ class WaitQueue(models.Model):
 
     def __eq__(self, other):
         return self.patient == other.patient
-    
+
     def __hash__(self):
         return self.id
 

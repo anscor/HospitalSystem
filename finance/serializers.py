@@ -19,3 +19,27 @@ class PayRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = PayRecord
         fields = "__all__"
+
+
+class RefundRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RefundRecord
+        fields = "__all__"
+
+
+class RefundRecordItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RefundRecordItem
+        fields = "__all__"
+
+
+class AuditRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AuditRecord
+        fields = "__all__"
+
+
+class AuditItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AuditItem
+        fields = "__all__"

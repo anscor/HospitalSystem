@@ -10,15 +10,16 @@ from django.contrib.auth.models import User, Group
 from laboratory.models import Laboratory
 from outpatient.models import Prescription
 from user.permissions import wrap_permission
-from user.views import (
+from reservation.models import Reservation
+
+from common.data_nested import get_data_nested
+from common.return_template import (
     return_param_error,
     return_not_find,
     return_forbiden,
     return_success,
+    return_not_allow,
 )
-from reservation.models import Reservation
-
-from common.data_nested import get_data_nested
 
 
 class PayTypeViewSet(viewsets.ModelViewSet):
@@ -134,7 +135,7 @@ class PayRecordViewSet(viewsets.ModelViewSet):
             pg = Group.objects.get(name="病人")
             if pg not in obj.groups.all():
                 return return_param_error("此用户不是病人！")
-            
+
             data["patient"] = re_id
         # 创建记录
         ser = PayRecordSerializer(data=data)
@@ -284,3 +285,148 @@ class PayRecordViewSet(viewsets.ModelViewSet):
     @wrap_permission(permissions.IsAdminUser)
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
+
+
+class RefundRecordViewSet(viewsets.ModelViewSet):
+    queryset = RefundRecord.objects.all()
+    serializer_class = RefundRecordSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        return return_not_allow()
+
+    def partial_update(self, request, *args, **kwargs):
+        return return_not_allow()
+
+    def create(self, request, *args, **kwargs):
+        request.data["creator"] = request.user.id
+        ser = RefundRecordSerializer(data=request.data)
+        if not ser.is_valid():
+            print(ser.errors)
+            return return_param_error()
+
+        ins = ser.save()
+
+        items = request.data.get("items", None)
+        if not items:
+            return return_param_error()
+
+        for item in items:
+            item["record"] = ins.id
+
+        ser = RefundRecordItemSerializer(data=items, many=True)
+        if not ser.is_valid():
+            ins.delete()
+            print(ser.errors)
+            return return_param_error()
+        ser.save()
+        return return_success("退款记录创建成功！")
+
+    def list(self, request, *args, **kwargs):
+        records = RefundRecord.objects.all()
+        data = []
+        for record in records:
+            data.append(
+                get_data_nested(
+                    record,
+                    RefundRecordSerializer,
+                    RefundRecordItemSerializer,
+                    many=True,
+                )
+            )
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        record = RefundRecord.objects.all().filter(id=self.kwargs.get("pk", 0))
+        if not record:
+            return return_not_find()
+        record = record[0]
+
+        data = get_data_nested(
+            record,
+            RefundRecordSerializer,
+            RefundRecordItemSerializer,
+            many=True,
+        )
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        pass
+
+
+class AuditRecordViewSet(viewsets.ModelViewSet):
+    queryset = AuditRecord.objects.all()
+    serializer_class = AuditRecordSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        data = {"applicant": request.user.id}
+        ser = AuditRecordSerializer(data=data)
+        if not ser.is_valid():
+            print(ser.errors)
+            return return_param_error()
+        ins = ser.save()
+
+        items = request.data
+        for item in items:
+            item["audit"] = ins.id
+        ser = AuditItemSerializer(data=items, many=True)
+        if not ser.is_valid():
+            ins.delete()
+            print(ser.errors)
+            return return_param_error()
+        ser.save()
+        return return_success("审核记录创建成功！")
+
+    def list(self, request, *args, **kwargs):
+        inss = AuditRecord.objects.all()
+        data = []
+        for ins in inss:
+            data.append(
+                get_data_nested(
+                    ins, AuditRecordSerializer, AuditItemSerializer, many=True
+                )
+            )
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        ins = AuditRecord.objects.all().filter(id=self.kwargs.get("pk", 0))
+        if not ins:
+            return return_not_find("审核记录不存在！")
+        ins = ins[0]
+
+        return Response(
+            get_data_nested(
+                ins, AuditRecordSerializer, AuditItemSerializer, many=True
+            ),
+            status=status.HTTP_200_OK,
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        return return_not_allow()
+
+    def update(self, request, *args, **kwargs):
+        ins = AuditRecord.objects.all().filter(id=self.kwargs.get("pk", 0))
+        if not ins:
+            return return_not_find("审核记录不存在！")
+        ins = ins[0]
+
+        data = {
+            "result": request.data.get("result", None),
+            "commet": request.data.get("commet", None),
+        }
+
+        if data["result"]:
+            data["result"] = 1
+        data["auditor"] = request.user.id
+
+        ser = AuditRecordSerializer(instance=ins, data = data, partial=True)
+        if not ser.is_valid():
+            print(ser.errors)
+            return return_param_error()
+        ser.save()
+        return return_success("审核记录修改成功！")
+
+    def partial_update(self, request, *args, **kwargs):
+        return return_not_allow()

@@ -6,17 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('medicine', '0006_auto_20191218_2019'),
+        ("medicine", "0006_auto_20191218_2019"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='medicinehandoutrecord',
-            name='is_handout',
+            model_name="medicinehandoutrecord", name="is_handout",
         ),
         migrations.AddField(
-            model_name='medicinehandoutrecord',
-            name='handout_status',
-            field=models.IntegerField(default=0, verbose_name='药品发放状态'),
+            model_name="medicinehandoutrecord",
+            name="handout_status",
+            field=models.IntegerField(default=0, verbose_name="药品发放状态"),
         ),
     ]
