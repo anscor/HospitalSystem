@@ -145,7 +145,12 @@ class PayRecordViewSet(viewsets.ModelViewSet):
             if not ser.is_valid():
                 return return_param_error()
             ser.save()
-            return return_success("创建成功！")
+            return Response(
+                data=get_data_nested(
+                    record, PayRecordSerializer, PayItemSerializer, many=True
+                ),
+                status=status.HTTP_201_CREATED,
+            )
         else:
             # 如果对应处方、化验单没有对应的条目（不允许这种情况出现）
             if not hasattr(obj, "items"):
@@ -169,8 +174,8 @@ class PayRecordViewSet(viewsets.ModelViewSet):
                     d = {
                         "record": record.id,
                         "name": item.medicine.name,
-                        "count": 1,
-                        "price": item.medicine.price,
+                        "count": item.count,
+                        "price": item.medicine.price * item.count,
                     }
                     data.append(d)
 
@@ -179,7 +184,12 @@ class PayRecordViewSet(viewsets.ModelViewSet):
                 print(ser.errors)
                 return return_param_error()
             ser.save()
-            return return_success("创建成功！")
+            return Response(
+                data=get_data_nested(
+                    record, PayRecordSerializer, PayItemSerializer, many=True
+                ),
+                status=status.HTTP_201_CREATED,
+            )
 
     def update(self, request, *args, **kwargs):
         record = PayRecord.objects.all().filter(id=self.kwargs.get("pk", 0))

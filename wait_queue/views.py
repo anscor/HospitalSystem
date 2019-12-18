@@ -27,7 +27,7 @@ class WaitQueueViewSet(viewsets.ViewSet):
     serializer_class = WaitQueueSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def _add_into_queue(self, instance):
+    def _add_into_queue(self, instance, wait_queues):
         # 如果是专家号，则加入到相应的专家号排队队列中
         if instance.doctor:
             if instance.doctor.id not in wait_queues["doctor"].keys():
@@ -47,6 +47,15 @@ class WaitQueueViewSet(viewsets.ViewSet):
 
         return True
 
+    def get_wait_queues(self):
+        wqs = WaitQueue.objects.all()
+        wait_queues = {"doctor": {}, "department": {}}
+        doctor = {}
+        department = {}
+        for wq in wqs:
+            self._add_into_queue(wq, wait_queues)
+        return wait_queues
+
     def create(self, request, *args, **kwargs):
         data = request.data
 
@@ -55,6 +64,8 @@ class WaitQueueViewSet(viewsets.ViewSet):
         department_id = data.get("department", None)
         pay_id = data.get("pay", None)
         doctor_id = data.get("doctor", None)
+
+        wait_queues = self.get_wait_queues()
 
         # 如果传入了预约，进行预约检查
         if reservation_id:
@@ -66,9 +77,9 @@ class WaitQueueViewSet(viewsets.ViewSet):
             if reservation.is_cancel:
                 return return_param_error("该预约已取消！")
 
-            if reservation.date < datetime.datetime.today():
+            if reservation.date < datetime.datetime.today().date():
                 return return_param_error("该预约已过期！")
-            elif reservation.date > datetime.datetime.today():
+            elif reservation.date > datetime.datetime.today().date():
                 return return_param_error("该预约时间不是今天！")
 
             if reservation.time.end <= datetime.datetime.now().time():
@@ -95,7 +106,7 @@ class WaitQueueViewSet(viewsets.ViewSet):
                 return return_param_error()
 
             ins = ser.save()
-            if self._add_into_queue(ins):
+            if self._add_into_queue(ins, wait_queues):
                 # 更新
                 ins.reservation.is_finish = 1
                 ins.reservation.save()
@@ -156,7 +167,7 @@ class WaitQueueViewSet(viewsets.ViewSet):
         if not ser.is_valid():
             print(ser.errors)
             return return_param_error()
-        if self._add_into_queue(ser.save()):
+        if self._add_into_queue(ser.save(), wait_queues):
             return return_success("成功加入到排队队列中！")
         else:
             return return_param_error("已经在排队中，不能重复添加！")
@@ -181,6 +192,7 @@ class WaitQueueViewSet(viewsets.ViewSet):
             return return_param_error("指定top时必须指定doctor或department！")
 
         data = {}
+        wait_queues = self.get_wait_queues()
         if doctor_id:
             doctor = User.objects.all().filter(id=doctor_id)
             if not doctor:
@@ -196,6 +208,7 @@ class WaitQueueViewSet(viewsets.ViewSet):
                     if top:
                         data = UserSerializer(p.patient).data
                         data["doctor"][doctor_id].pop(0)
+                        p.delete()
                         break
                     data["doctor"][doctor_id].append(
                         UserSerializer(p.patient).data
@@ -216,6 +229,7 @@ class WaitQueueViewSet(viewsets.ViewSet):
                     if top:
                         data = UserSerializer(p.patient).data
                         data["department"][department_id].pop(0)
+                        p.delete()
                         break
                     data["department"][department_id].append(
                         UserSerializer(p.patient).data
