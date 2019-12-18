@@ -134,7 +134,9 @@ class PrescriptionItem(models.Model):
     # 服用时长，这个药要用多少天，为空表示此药医生可能有其他安排，应在注意事项内说明
     days = models.IntegerField(null=True, blank=True, verbose_name="服用时长")
     # 其他注意事项
-    commet = models.CharField(max_length=64, verbose_name="其他")
+    commet = models.CharField(
+        max_length=64, null=True, blank=True, verbose_name="其他"
+    )
     # 药物总数量
     count = models.IntegerField(verbose_name="药物总数量")
     # 数量单位
