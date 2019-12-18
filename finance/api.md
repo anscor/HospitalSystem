@@ -113,7 +113,33 @@
 
 #### 响应参数
 
-##### 200 400 401
+##### 成功时 201
+
+```json
+{
+    "id": 6,
+    "receive": null,
+    "refund": null,
+    "method": 0,
+    "create_time": "2019-12-17T16:18:03.897531",
+    "modify_time": "2019-12-17T16:18:03.897531",
+    "patient": 14,
+    "pay_type": 2,
+    "creator": 14,
+    "modifier": null,
+    "items": [
+        {
+            "id": 5,
+            "name": "专家号费用",
+            "count": 1,
+            "price": 100,
+            "record": 6
+        }
+    ]
+}
+```
+
+##### 失败时 400 401
 
 ### 更新某条缴费记录
 
