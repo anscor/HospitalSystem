@@ -116,7 +116,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 | PUT      | /api/pay-types/{pk}/             | 修改某种缴费类型（完成）                     |
 | DELETE   | /api/pay-types/{pk}/             | 删除某种缴费类型（管理员可用）（完成）       |
 | GET      | /api/pay-types/{pk}/pay-records/ | 某种缴费类型下的所有缴费记录（完成）         |
-| GET      | /api/users/{pk}/pay-records/     | 某个用户下的所有缴费记录                     |
+| GET      | /api/users/{pk}/pay-records/     | 某个用户下的所有缴费记录（完成）             |
 | GET      | /api/refund-records/             | 所有退款记录                                 |
 | POST     | /api/refund-records/             | 创建退款记录                                 |
 | GET      | /api/refund-records/{pk}/        | 某条退款记录                                 |
@@ -187,9 +187,8 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 
 ## 分诊排队
 
-| 请求方法 | 地址                                              | 说明                     |
-| -------- | ------------------------------------------------- | ------------------------ |
-| POST     | /api/wait-queue/                                  | 将病人加入到排队队列中   |
-| GET      | /api/wait-queue/\[?top=]\[?doctor=][?department=] | 获取排队情况             |
-| DELETE   | /api/wait-queue/\[?doctor=][?department=]         | 删除指定队列中第一个病人 |
+| 请求方法 | 地址                                              | 说明                   |
+| -------- | ------------------------------------------------- | ---------------------- |
+| POST     | /api/wait-queue/                                  | 将病人加入到排队队列中 |
+| GET      | /api/wait-queue/\[?top=]\[?doctor=][?department=] | 获取排队情况           |
 

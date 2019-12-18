@@ -4,6 +4,7 @@ from .serializers import *
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django.db.models import Q
 
 from laboratory.models import Laboratory
 from outpatient.models import Prescription
@@ -68,7 +69,9 @@ class PayTypeViewSet(viewsets.ModelViewSet):
 
         data = []
         if hasattr(ins, "records"):
-            records = ins.records.all()
+            records = ins.records.all().filter(
+                Q(receive__isnull=False) & Q(refund__isnull=False)
+            )
             for rec in records:
                 data.append(
                     get_data_nested(
@@ -209,7 +212,9 @@ class PayRecordViewSet(viewsets.ModelViewSet):
         return return_success("修改成功！")
 
     def list(self, request, *args, **kwargs):
-        records = PayRecord.objects.all()
+        records = PayRecord.objects.all().filter(
+            Q(receive__isnull=False) & Q(refund__isnull=False)
+        )
 
         data = []
         for record in records:
@@ -227,6 +232,9 @@ class PayRecordViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         record = PayRecord.objects.all().filter(id=self.kwargs.get("pk", 0))
+        record = record.filter(
+            Q(receive__isnull=False) & Q(refund__isnull=False)
+        )
         if not record:
             return return_not_find("缴费记录不存在！")
         record = record[0]

@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from common.return_template import (
     return_forbiden,
@@ -30,6 +31,8 @@ from laboratory.serializers import (
     LaboratoryItemSerializer,
     LaboratorySerializer,
 )
+
+from finance.serializers import PayRecordSerializer, PayItemSerializer
 
 
 class UserLogout(APIView):
@@ -320,7 +323,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
         data = request.data
         data["username"] = ret.username
-        user_ser = UserSerializer(instance=ret, data=request.data, partial=True)
+        user_ser = UserSerializer(
+            instance=ret, data=request.data, partial=True
+        )
 
         if not user_ser.is_valid():
             return return_param_error()
@@ -575,6 +580,46 @@ class UserViewSet(viewsets.ModelViewSet):
                     items = LaboratoryItemSerializer(la.items, many=True).data
                 d["items"] = items
                 data.append(d)
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @wrap_permission(permissions.IsAuthenticated)
+    @action(
+        methods=["GET"],
+        detail=True,
+        url_path="pay-records",
+        url_name="pay-records",
+    )
+    def get_pay_records(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+        user = User.objects.filter(id=pk)
+        if not user:
+            return return_not_find("用户不存在！")
+        user = user[0]
+
+        pg = Group.objects.get(name="病人")
+
+        data = []
+        prs = None
+        if pg in user.groups.all():
+            if hasattr(user, "paid_records"):
+                prs = user.paid_records.all().filter(
+                    Q(receive__isnull=False) & Q(refund__isnull=False)
+                )
+        else:
+            if hasattr(user, "created_pay_records"):
+                prs = user.created_pay_records.all().filter(
+                    Q(receive__isnull=False) & Q(refund__isnull=False)
+                )
+
+        if prs:
+            for pr in prs:
+                data.append(
+                    get_data_nested(
+                        pr, PayRecordSerializer, PayItemSerializer, many=True
+                    )
+                )
 
         return Response(data=data, status=status.HTTP_200_OK)
 
