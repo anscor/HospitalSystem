@@ -18,6 +18,7 @@ from common.return_template import (
 )
 from common.groups import get_all_groups
 from common.data_nested import get_data_nested
+from common.filters import filter_date
 
 from user.permissions import wrap_permission
 from reservation.serializers import VisitSerializer, ReservationSerializer
@@ -31,13 +32,16 @@ from laboratory.serializers import (
     LaboratoryItemSerializer,
     LaboratorySerializer,
 )
-
 from finance.serializers import (
     PayRecordSerializer,
     PayItemSerializer,
     RefundRecordSerializer,
     RefundRecordItemSerializer,
+    AuditRecordSerializer,
+    AuditItemSerializer,
 )
+
+import datetime
 
 
 class UserLogout(APIView):
@@ -328,7 +332,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
         data = request.data
         data["username"] = ret.username
-        user_ser = UserSerializer(instance=ret, data=request.data, partial=True)
+        user_ser = UserSerializer(
+            instance=ret, data=request.data, partial=True
+        )
 
         if not user_ser.is_valid():
             return return_param_error()
@@ -645,6 +651,14 @@ class UserViewSet(viewsets.ModelViewSet):
         inss = None
         if hasattr(user, "created_refund_records"):
             inss = user.created_refund_records.all()
+            inss = filter_date(
+                inss,
+                start=request.data.get("start", None),
+                end=request.data.get("end", None),
+                format="%Y-%m-%d",
+                kind=1,
+                attr="create_time",
+            )
 
         if inss:
             for ins in inss:
@@ -653,6 +667,57 @@ class UserViewSet(viewsets.ModelViewSet):
                         ins,
                         RefundRecordSerializer,
                         RefundRecordItemSerializer,
+                        many=True,
+                    )
+                )
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @wrap_permission(permissions.IsAuthenticated)
+    @action(
+        methods=["GET"],
+        detail=True,
+        url_path="audit-records",
+        url_name="audit-records",
+    )
+    def get_audit_records(self, request, pk=None):
+        if not pk:
+            return return_param_error()
+        user = User.objects.filter(id=pk)
+        if not user:
+            return return_not_find("用户不存在！")
+        user = user[0]
+
+        data = []
+        inss = None
+        if hasattr(user, "applied_records"):
+            inss = user.applied_records.all()
+            inss = filter_date(
+                inss,
+                start=request.data.get("start", None),
+                end=request.data.get("end", None),
+                format="%Y-%m-%d",
+                kind=1,
+                attr="create_time",
+            )
+        elif hasattr(user, "audited_records"):
+            inss = user.audited_records.all()
+            inss = filter_date(
+                inss,
+                start=request.data.get("start", None),
+                end=request.data.get("end", None),
+                format="%Y-%m-%d",
+                kind=1,
+                attr="audit_time",
+            )
+
+        if inss:
+            for ins in inss:
+                data.append(
+                    get_data_nested(
+                        ins,
+                        AuditRecordSerializer,
+                        AuditItemSerializer,
                         many=True,
                     )
                 )
