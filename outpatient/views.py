@@ -153,7 +153,7 @@ class MedicalRecordViewSet(viewsets.ModelViewSet):
             print(ser.errors)
             return return_param_error()
         ser.save()
-        return return_success("创建成功！")
+        return Response(data=ser.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         record = MedicalRecord.objects.all().filter(id=self.kwargs.get("pk", 0))
