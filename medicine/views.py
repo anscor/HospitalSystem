@@ -169,10 +169,11 @@ class MedicineHandoutRecordViewSet(viewsets.ModelViewSet):
         mhr = ser.save()
 
         # 更改药物库存
-        for item in mhr.prescription.items.all():
-            item.medicine.count -= item.count
-            item.medicine.modifier = request.user
-            item.medicine.save()
+        if mhr.handout_status == 4:
+            for item in mhr.prescription.items.all():
+                item.medicine.count -= item.count
+                item.medicine.modifier = request.user
+                item.medicine.save()
 
         data = MedicineHandoutRecordSerializer(mhr).data
         data["prescription"] = get_data_nested(

@@ -234,6 +234,9 @@ class PayRecordViewSet(viewsets.ModelViewSet):
         if hasattr(record, "reservation"):
             record.reservation.is_paid = True
             record.reservation.save()
+        if hasattr(record, "prescription"):
+            record.prescription.is_paid = True
+            record.prescription.save()
         return Response(
             data=get_data_nested(
                 record, PayRecordSerializer, PayItemSerializer, many=True
